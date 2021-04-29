@@ -1,0 +1,5391 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Convergence.Tech Identity API",
+    "description": "<br /><h1>Issue Verifiable Credentials, simply.</h1>Point and shoot capabilities. Get started fast, no setup required.<br /><br /><ol><li>Register and obtain your api key and orgId (simply contact info@convergence.tech)</li><li>Start issuing digital credentials</li></ol>",
+    "contact": {
+      "email": "adam@convergence.tech"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://virtserver.swaggerhub.com/AdamJLemmon/api.trybe.id/1.0.0",
+      "description": "SwaggerHub API Auto Mocking"
+    },
+    {
+      "url": "https://api.dev.trybe.id/",
+      "description": "Development API"
+    },
+    {
+      "url": "https://api.staging.trybe.id/",
+      "description": "Staging API"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Provider",
+      "description": "Quick start `Credential Provider`. Intergrate this API seamlessly into your existing applications to leverage Verifiable Credentials."
+    },
+    {
+      "name": "VC-HTTP-API",
+      "description": "Implementation of the w3c interoperable vc-http-api spec: https://w3c-ccg.github.io/vc-http-api/."
+    },
+    {
+      "name": "accounts",
+      "description": "Account management."
+    },
+    {
+      "name": "adapter",
+      "description": "Routes that are hit from our adapters due to external system integrations."
+    },
+
+    {
+      "name": "admin",
+      "description": "Authentication of secrets for admin only routes. "
+    },
+
+    {
+      "name": "assets",
+      "description": "Asset management, related to organizations mainly."
+    },
+    {
+      "name": "auth",
+      "description": "Authentication."
+    },
+    {
+      "name": "issuer",
+      "description": "Functionality related to issuers."
+    },
+    {
+      "name": "organizations",
+      "description": "Functionality related to an organization."
+    },
+    {
+      "name": "public",
+      "description": "No auth required, general public."
+    },
+    {
+      "name": "Verify",
+      "description": "Verify credentials."
+    },
+    {
+      "name": "wallets",
+      "description": "Functionality related to wallets."
+    },
+    {
+      "name": "schema",
+      "description": "Get schemas for each endpoint."
+    }
+  ],
+  "paths": {
+    "/{prefix}/{route}/schema.json": {
+      "get": {
+        "tags": [
+          "schema"
+        ],
+        "summary": "Will get the schema for the route if it exists,",
+        "parameters": [
+          {
+            "name": "prefix",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "accounts"
+          },
+          {
+            "name": "route",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "register"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "required": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "example": "email"
+                      }
+                    },
+                    "properties": {
+                      "type": "object",
+                      "properties": {
+                        "email": {
+                          "type": "object",
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "example": "string"
+                            },
+                            "example": {
+                              "type": "string",
+                              "example": "alice@faber.com"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResourceNotFound"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/{email}": {
+      "get": {
+        "tags": [
+          "accounts"
+        ],
+        "summary": "Will get the account data",
+        "description": "Query with the email to retrieve account data for an email.",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "alice@faber.com"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Account"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResourceNotFound"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer Token": []
+          }
+        ]
+      }
+    },
+    "/accounts/createSetPasswordToken/{email}": {
+      "post": {
+        "tags": [
+          "accounts"
+        ],
+        "summary": "Create a token to set the password of an account.",
+        "description": "Specify the account, you wish to generate a token for. This may be done by that account or by and admin account.\n",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "alice@faber.com"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "$ref": "#/components/schemas/SetPasswordToken"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request. Something broke along the way... generally a db write.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBadRequest"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not Authorized. Non-admin or not the current account (alice for alice) trying to create a token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorNotAuthorized"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource Not Found. If the account you are trying to create a token for does not exist.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResourceNotFound"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer Token": []
+          }
+        ]
+      }
+    },
+    "/accounts/createSetPasswordTokenAndSendEmail/{email}": {
+      "post": {
+        "tags": [
+          "accounts"
+        ],
+        "summary": "Create a token to set the password of an account and send an email to that account to do so.",
+        "description": "Specify the account, you wish to generate a token for. This may be done by that account or by and admin account.\nThis will generate a URL for the account owner to navigate to in order to set the password.\nAn example URL trybe.id?token=bf5ba1d2c1d4b21df4084743e3acf3f103a4a9284664d9fdc4c230f70ff22cbb\n",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "alice@faber.com"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "$ref": "#/components/schemas/SetPasswordToken"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request. Something broke along the way... generally a db write.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBadRequest"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not Authorized. Non-admin or not the current account (alice for alice) trying to create a token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorNotAuthorized"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource Not Found. If the account you are trying to create a token for does not exist.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResourceNotFound"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer Token": []
+          }
+        ]
+      }
+    },
+    "/accounts/register": {
+      "post": {
+        "tags": [
+          "accounts"
+        ],
+        "summary": "Inital registration of an account",
+        "requestBody": {
+          "description": "Main account info. Note that the organization will be looked up by name but the objectID stored.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Account"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not Authorized. Only admins may register accounts.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorNotAuthorized"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource Not Found. Will throw if the organization defined can not be found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResourceNotFound"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorConflict"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer Token": []
+          }
+        ]
+      }
+    },
+    "/accounts/setPassword": {
+      "post": {
+        "tags": [
+          "accounts"
+        ],
+        "summary": "Inital registration of an account",
+        "requestBody": {
+          "description": "Main account info. Note that the organization will be looked up by name but the objectID stored.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetPasswordRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Ok"
+          },
+          "400": {
+            "description": "Bad Request. Something broke along the way... generally a db write.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBadRequest"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid Credentials. If the token has expired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorInvalidCredentials"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource Not Found. Will throw if the token can not be found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResourceNotFound"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/adapter/issueCredentials": {
+      "post": {
+        "tags": [
+          "adapter"
+        ],
+        "summary": "Issue credentials from an adapter",
+        "parameters": [
+          {
+            "name": "Adapter-Authorization",
+            "in": "header",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "credDefId": {
+                    "type": "string",
+                    "example": "5e94a08a60a283764a475d22"
+                  },
+                  "orgId": {
+                    "type": "string",
+                    "description": "The id or the org this credential is being issued from. Required as relayed by an adapter.",
+                    "example": "5e94a08a60a283764a475d22"
+                  },
+                  "recipients": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "description": "Full name of the recipient",
+                          "example": "Alice Faber"
+                        },
+                        "email": {
+                          "type": "string",
+                          "example": "alice@faber.con"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IssueCredentialsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid Credentials. If no adapter-authorization header.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorInvalidCredentials"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource Not Found. Will throw org not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResourceNotFound"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/secrets": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Add a new secret to an admin account.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "secret": {
+                    "type": "string",
+                    "example": "d43614e0-da60-4d92-9e52-431ce26a8ba9"
+                  }
+                }
+              }
+            }
+          },
+          "reqired": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IssueSecret"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid secret. Secret is not a valid uuid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorInvalidContent"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid Admin Credentials.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorInvalidCredentials"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource Not Found if secret is empty.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResourceNotFound"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Secret already exists.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorInvalidContent"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Delete a secret from an admin account.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "secret": {
+                    "type": "string",
+                    "example": "d43614e0-da60-4d92-9e52-431ce26a8ba9"
+                  }
+                }
+              }
+            }
+          },
+          "reqired": true
+        },
+        "responses": {
+          "204": {
+            "description": "Deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteSecret"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid Admin Credentials.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorInvalidCredentials"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource Not Found if secret is empty.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResourceNotFound"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/assets/download": {
+      "get": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Will create a singed url and return for download, default expiry is 60s.",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "query",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "5e94a08a60a283764a475d22/prod/cat.png"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string",
+                      "description": "The signed url for download.",
+                      "example": "https://s3.ca-central-1.amazonaws.com/dev.trybe.id/5ec31b11fa389f0f1da44544/test/dummy-data?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIZ2OXQCHGCCF4OXQ%2F20200518%2Fca-central-1%2Fs3%2Faws4_request&X-Amz-Date=20200518T233234Z&X-Amz-Expires=60&X-Amz-Signature=ee6370af07104909affe9f0b93dc9f956d329f7add085bade24a0deda28cadb4&X-Amz-SignedHeaders=host"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/assets/upload": {
+      "post": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Add a new asset to an organization.",
+        "description": "Will do so based on the org associated with the logged in account. Asset size limit is currently enforced at 6MB.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "data",
+                  "type"
+                ],
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "type": "string",
+                    "description": "The base64 encoded raw data WITHOUT the data URL prefix, it must be stripped and just the base64 data passed. ie. these prefixes need to be parsed out data:image/png;base64,",
+                    "example": "iVBORw0KGgoAAAANSUhEUgAAAE..."
+                  },
+                  "type": {
+                    "type": "string",
+                    "description": "Must be a valid MIME type",
+                    "example": "image/png"
+                  },
+                  "key": {
+                    "type": "string",
+                    "description": "The key to save this data at, it will be wrapped in the organization id. If not set a short uuid will be generated. Should NOT include an extension.  Extension will be added based on mime type. https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types",
+                    "example": "my-data/images/cat"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "required": [
+                    "ETag",
+                    "Key",
+                    "Location",
+                    "key"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "ETag": {
+                      "type": "string",
+                      "example": "\"aae81a0ad3e3a3788e408e69275588f2\""
+                    },
+                    "Location": {
+                      "type": "string",
+                      "example": "https://s3.ca-central-1.amazonaws.com/dev.trybe.id/test/dummy-data"
+                    },
+                    "key": {
+                      "type": "string",
+                      "example": "5ec3186ce720d10c9970581d/test/dummy-data"
+                    },
+                    "Key": {
+                      "type": "string",
+                      "example": "5ec3186ce720d10c9970581d/test/dummy-data"
+                    },
+                    "Bucket": {
+                      "type": "string",
+                      "description": "The location to store the data, this is recommended to be set by default.",
+                      "example": "dev.trybe.id"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request. Something broke along the way... generally a db write.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBadRequest"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "InvalidContent. When the type passed in is not a valid MIME type (https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorInvalidContent"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer Token": []
+          }
+        ]
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Basic login",
+        "requestBody": {
+          "description": "Login data",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid Credentials. If the password does not match.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorInvalidCredentials"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource Not Found. When the account or the account's organization can not be found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResourceNotFound"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/verifyJwt": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Enable 3rd party to use trybe cx and idp and to provide auth services",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "jwt": {
+                    "type": "string",
+                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZGJiODhlNzg0YzhmMDNmM2ZmNzZjOWEiLCJ1c2VybmFtZSI6ImFkYW1AY29udmVyZ2VuY2UudGVjaDc0MC4yNDM4ODkwNDc0NjU2IiwiaWF0IjoxNTcyNTcxMzY3LCJleHAiOjE1NzI1ODAzNjd9.96lfQtuvlbHAnodJ_MbQlVqc-laZWt_DTL9uWZRSW5g"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "valid": {
+                      "type": "boolean",
+                      "description": "Will return valid as true or false and error is possible",
+                      "example": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/credentials/issue": {
+      "post": {
+        "tags": [
+          "VC-HTTP-API"
+        ],
+        "summary": "Will sign a Verifiable Credential and return a Linked Data Proof.",
+        "description": "A valid JSON-LD Verifiable Credential must be passed. The issuer DID must be one that the API has the cryptographic signing material for.",
+        "requestBody": {
+          "description": "JSON-LD Credential Data",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "credential": {
+                    "$ref": "#/components/schemas/VerifiableCredential"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerifiableCredentialLDProof"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBadRequest"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/credentials/jwt": {
+      "post": {
+        "tags": [
+          "VC-HTTP-API"
+        ],
+        "description": "Example of a Verifiable Credential JWT proof.",
+        "requestBody": {
+          "description": "JSON-LD Credential Data",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JWTVerifiableCredential"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerifiableCredentialLDProof"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBadRequest"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/credentials/key": {
+      "get": {
+        "tags": [
+          "VC-HTTP-API"
+        ],
+        "summary": "Will generate a new key pair and return the Decentralized Identifier.",
+        "description": "Generate a new ED25519 key pair, saving materials in Key Vault and return just the key identifier.",
+        "responses": {
+          "201": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "did": {
+                      "type": "string",
+                      "example": "did:key:z6MkgHxqyP3Y8ag2fRpJHZwxwecGFm21usgUyvjfZdfEabdW"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBadRequest"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/credentials/verify": {
+      "post": {
+        "tags": [
+          "VC-HTTP-API"
+        ],
+        "summary": "Will verify a Verifiable Credential Linked Data Proof.",
+        "description": "Present any valid JSON-LD Verifiable Credential Linked Data proof.",
+        "requestBody": {
+          "description": "JSON-LD Verifiable Credential Linked Data Proof",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "verifiableCredential": {
+                    "$ref": "#/components/schemas/VerifiableCredentialLDProof"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "checks": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "example": "proof"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBadRequest"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/presentations/prove": {
+      "post": {
+        "tags": [
+          "VC-HTTP-API"
+        ],
+        "required": [
+          "presentation",
+          "options"
+        ],
+        "summary": "Will sign a Verifiable Presentation, proving ownership, and return a Linked Data Proof.",
+        "description": "A valid JSON-LD Verifiable Presentation must be passed. The holder DID must be one that the API has the cryptographic signing material for.",
+        "requestBody": {
+          "description": "JSON-LD Verifiable Presentation Data",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "presentation": {
+                    "$ref": "#/components/schemas/VerifiablePresentation"
+                  },
+                  "options": {
+                    "type": "object",
+                    "properties": {
+                      "challenge": {
+                        "type": "string",
+                        "example": "48c0a280-0533-45b6-9dda-f03e36733782"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerifiablePresentationLDProof"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBadRequest"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/presentations/verify": {
+      "post": {
+        "tags": [
+          "VC-HTTP-API"
+        ],
+        "required": ["verifiablePresentation", "options"],
+        "summary": "Will verify a Verifiable Presentation Linked Data Proof.",
+        "description": "Present any valid JSON-LD Verifiable Presentation Linked Data proof.",
+        "requestBody": {
+          "description": "JSON-LD Verifiable Presentation Linked Data Proof",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "verifiablePresentation": {
+                    "$ref": "#/components/schemas/VerifiablePresentationLDProof"
+                  },
+                  "options": {
+                    "type": "object",
+                    "properties": {
+                      "challenge": {
+                        "type": "string",
+                        "example": "48c0a280-0533-45b6-9dda-f03e36733782"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "checks": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "example": "proof"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBadRequest"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/issuer/addCredentialDefinition": {
+      "post": {
+        "tags": [
+          "issuer"
+        ],
+        "summary": "Add a new credential definition.",
+        "description": "Add a new template of a credential to be added to the organization.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CredentialDefinitionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IDObject"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request. Something broke along the way... generally a db write.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBadRequest"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict. When the definition name already exists within the account's organization.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorConflict"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer Token": []
+          }
+        ]
+      }
+    },
+    "/issuer/archiveCredentialDefinition": {
+      "put": {
+        "tags": [
+          "issuer"
+        ],
+        "summary": "Archive a credential definition.",
+        "description": "Set the state of a credential definition to archived",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "credDefId": {
+                    "type": "string",
+                    "example": "51d7a758-593f-4e42-a8f1-f2d585bf2f5a"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CredentialDefinition"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request. Something broke along the way... generally a db write.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBadRequest"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer Token": []
+          }
+        ]
+      }
+    },
+    "/issuer/getIssuedCertsByAccount": {
+      "get": {
+        "tags": [
+          "issuer"
+        ],
+        "summary": "Get all of the certs that were issued by this issuer account. Uses the email in the jwt.",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "description": "An array of asset objects",
+                  "items": {
+                    "$ref": "#/components/schemas/SavedOpenCertsCert"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer Token": []
+          }
+        ]
+      }
+    },
+    "/issuer/getIssuedCertsByDefaultOrg": {
+      "get": {
+        "tags": [
+          "issuer"
+        ],
+        "summary": "Get all of the certs that were issued by this issuer organization. Uses the organization associated with the account in the jwt.",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SavedOpenCertsCert"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer Token": []
+          }
+        ]
+      }
+    },
+    "/issuer/getIssuedCertsBatchByOrg" : {
+      "get" : {
+        "tags" : [ "issuer" ],
+        "summary" : "Get certs that were issued by this issuer organization by providing a credential id, page number and a page limit.",
+        "parameters": [
+          {
+            "name": "credDefId",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "606c0abc0ber66002dc9bb25"
+          },
+            {
+            "name": "pageNumber",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "10"
+          },
+            {
+            "name": "pageSize",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "1"
+          }
+        ],
+        "responses" : {
+          "200" : {
+            "description" : "Ok",
+            "content" : {
+              "application/json" : {
+                "schema" : {                
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/IssueCredentialsBatchResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "Bearer Token" : [ ]
+        } ]
+      }
+    },
+    "/issuer/getRecipientCerts": {
+      "get": {
+        "tags": [
+          "issuer"
+        ],
+        "summary": "Get all certs that were issued to a specific recipient.",
+        "description": "Will query with the email associated with the jwt. Will return empty array if no items found, will not throw.",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "description": "An array of asset objects",
+                  "items": {
+                    "$ref": "#/components/schemas/SavedOpenCertsCert"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer Token": []
+          }
+        ]
+      }
+    },
+    "/issuer/getRecipientCerts/{email}": {
+      "get": {
+        "tags": [
+          "issuer"
+        ],
+        "summary": "Get all certs that were issued to a specific recipient.",
+        "description": "Will return empty array if no items found, will not throw.",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "alice@faber.com"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "description": "An array of asset objects",
+                  "items": {
+                    "$ref": "#/components/schemas/SavedOpenCertsCert"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer Token": []
+          }
+        ]
+      }
+    },
+    "/issuer/getCredentialDefinitions": {
+      "get": {
+        "tags": [
+          "issuer"
+        ],
+        "summary": "Get all credential definitions for an issuer.",
+        "description": "Will query with the email associated with the jwt.",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "description": "An array of asset objects",
+                  "items": {
+                    "$ref": "#/components/schemas/CredentialDefinition"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer Token": []
+          }
+        ]
+      }
+    },
+    "/issuer/issueAndPublishCertificates": {
+      "post": {
+        "tags": [
+          "issuer"
+        ],
+        "summary": "Issue and publish a certificate, publish meaning by rooting on-chain.",
+        "description": "Issued the certificate publishing the merkle root on the Ethereum blockchain currently. Will send the transaction but will NOT wait for the transaction to be completed.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "certs": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/IssueCredentialRequestCert"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IssueCredentialsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request. Something broke along the way... generally a db write.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBadRequest"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer Token": []
+          }
+        ]
+      }
+    },
+    "/issuer/revokeCert": {
+      "put": {
+        "tags": [
+          "issuer"
+        ],
+        "summary": "Revoke a certificate.",
+        "description": "May only be done by an account associated with the issuing organization identified in the jwt.",
+        "requestBody": {
+          "description": "Id of the cert to revoke.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IDObject"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TxHash"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not Authorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorNotAuthorized"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResourceNotFound"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer Token": []
+          }
+        ]
+      }
+    },
+    "/organizations/{id}": {
+      "get": {
+        "tags": [
+          "organizations"
+        ],
+        "summary": "Get a specific organization by its uuid",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "5e691f055cd52a228bc9aba2"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Organization"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not Authorized. Only admins can retrieve all organizations.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorNotAuthorized"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer Token": []
+          }
+        ]
+      }
+    },
+    "/organizations/addContacts": {
+      "put": {
+        "tags": [
+          "organizations"
+        ],
+        "summary": "Adds a list of contacts to an org.",
+        "description": "Pass in a list of contacts to add to the contact list. This is an array of arrays.\nEach contact must contain [type, contact, firstName, lastName] in that order\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddContactsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "newContacts": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Contact"
+                      }
+                    },
+                    "duplicates": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Contact"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request. Something broke along the way... generally a db write.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBadRequest"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource Not Found. If the account you are trying to add contacts to does not exist.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResourceNotFound"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer Token": []
+          }
+        ]
+      }
+    },
+    "/organizations/getContacts": {
+      "get": {
+        "tags": [
+          "organizations"
+        ],
+        "summary": "Will get a list of contacts for the organization",
+        "description": "No params or query needed as account data is pulled from the account encoded in the JWT. If not found will return empty array.",
+        "parameters": [
+          {
+            "name": "tags",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "example": "Class 1"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully found contacts for this org",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Contact"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer Token": []
+          }
+        ]
+      }
+    },
+    "/organizations/getContactTags": {
+      "get": {
+        "tags": [
+          "organizations"
+        ],
+        "summary": "Will get a list of contact tags for the organization",
+        "responses": {
+          "200": {
+            "description": "Successfully found tags for this org",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "example": "Class 1"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer Token": []
+          }
+        ]
+      }
+    },
+    "/organizations/getAll": {
+      "get": {
+        "tags": [
+          "organizations"
+        ],
+        "summary": "Get all organizations",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Organization"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not Authorized. Only admins can retrieve all organizations.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorNotAuthorized"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer Token": []
+          }
+        ]
+      }
+    },
+    "/organizations/register": {
+      "post": {
+        "tags": [
+          "organizations"
+        ],
+        "summary": "Register a new organization.",
+        "description": "Add a new organization to the backend. This endpoint will complete the full configuration for a new organization. This includes creation of encryption keys, signing key-pairs (Ethereum for example), deployment of certificateStore and related smart contracts.",
+        "requestBody": {
+          "description": "A new organization object to register.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrganizationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Organization"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not Authorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorNotAuthorized"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorConflict"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer Token": []
+          }
+        ]
+      }
+    },
+    "/organizations/registerFromThirdParty": {
+      "post": {
+        "tags": [
+          "organizations"
+        ],
+        "summary": "Register a new organization from a third party partner.",
+        "description": "Creates a pending organization and send an email to the admin to create / activate this organization.",
+        "parameters": [
+          {
+            "name": "vcx-api-key",
+            "in": "header",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "example": "1838e947-227d-4124-8125-f29a32b2516b"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "The details of the email to do the creation and the subscription details for this organization.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": ["email"],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "description": "The email that will be registered and notified to activate the organization.",
+                    "example": "alice@gmail.com"
+                  },
+                  "subscription": {
+                    "type": "object",
+                    "description": "Details about the subscription that was purchased with the third party.",
+                    "$ref": "#/components/schemas/OrganizationSubscription"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "example": {
+                  "url": "https://api.trybe.id/xyz/7C75-mkQd",
+                  "organization": {
+                    "state": "pending",
+                    "admin": "adam@trybe.id",
+                    "subscriptions": {
+                      "active": {
+                        "durationMonths": 3,
+                        "credentialLimit": 50,
+                        "overage": {
+                          "disruptService": true,
+                          "perCredentialCost": 0,
+                          "perCredentialCostCurrency": "CAD",
+                          "overageLimitPercentage": 0
+                        },
+                        "payment": {
+                          "status": "COMPLETE",
+                          "amount": 0,
+                          "currency": "CAD",
+                          "updatedAt": "2021-03-13T18:23:30.008Z"
+                        },
+                        "subscriptionChannel": {
+                          "name": "Trybe.ID",
+                          "redirectUri": "http://localhost:3000"
+                        },
+                        "createdAt": "2021-03-13T18:23:33.220Z",
+                        "expiry": "2021-06-13T17:23:33.220Z"
+                      },
+                      "history": []
+                    }
+                  }
+                },
+                "schema": {
+                  "properties": {
+                    "url": {
+                      "type": "string",
+                      "description": "The URL to share with the email address in order to create / activate the organization. Will also be sent via email to the email provided in the request.",
+                      "example": "http://localhost:3002/xyz/NrYlwP7RI"
+                    },
+                    "organization": {
+                      "type": "object",
+                      "properties": {
+                        "state": {
+                          "type": "string",
+                          "example": "pending"
+                        },
+                        "admin": {
+                          "type": "string",
+                          "example": "alice@trybe.id"
+                        },
+                        "subscriptions": { 
+                          "type": "object",
+                          "properties": {
+                            "active": {
+                              "type": "object",
+                              "$ref": "#/components/schemas/OrganizationSubscription"
+                            }, 
+                            "history": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/components/schemas/OrganizationSubscription"
+                              }
+                            }   
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not Authorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorNotAuthorized"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorConflict"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/organizations/renderers": {
+      "post": {
+        "tags": [
+          "organizations"
+        ],
+        "summary": "Add a new renderer.",
+        "description": "Add a new renderer config to the organization. This will update the speficied id of the renderer within the org document. This may only be done by admin accounts at present.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RendererRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "409": {
+            "description": "Conflict. If the renderer id already exists in the org.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorConflict"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer Token": []
+          }
+        ]
+      }
+    },
+    "/provider/issueCustomCredential": {
+      "post": {
+        "tags": [
+          "Provider"
+        ],
+        "summary": "Issue your own custom Verifiable Credentials, simply.",
+        "description": "This endpoint removes just about all of the complexity associated with credential issuance while providing a wide array of options to meet your specific use case requirements.\n\nThis endpoint allows credentials to be defined from scratch directly in raw `JSON` while also handling the communication (email, sms, etc) and final issuance into the Holder's wallet, all with a single request.\n\n<h1>The Payload</h1>\n\n<h2>orgId</h2>\n\n A unique identifier for your organization provided at time of registration.\n\nThat is the only required property! A minimal request is as simple as:\n\n <pre><code>POST /provider/issueCustomCredential\nvcx-api-key: 123..321\n\n{\n\t'orgId': '123..321'\n}\n</code></pre><h2>credential (optional)</h2>\n\nThe raw `JSON` to be issued as a Verifiable Credential. If nothing is passed the default values will be used creating a largely empty credential with a resulting `credentialSubject` including just an `id`, but serves as a quick way to get started exploring.\n\n<h3>credential.credentialSubject (optional)</h3>\n\nThe content of the credential, defining it's subject. The following values are supported by default as top level credentialSubject properties:\n\n`credential.credentialSubject.id` (optional): A unique identifier for the subject. Note in most cases this should not be provided as it will be populated at the point of issuance where the Holder is able to generate and prove control of the identifier, for example when using a directed Decentralized Identifier (DID).\n\n`credential.credentialSubject.name` (optional): The name of the subject.\n\n`credential.credentialSubject.results` (optional): An array of objects containing `name` and `value` pairs communicating what the credential results are.\n\n<h3>credential.additionalData (optional)</h3>\n\nSpecify further metadata about the credential, most commonly for visualization or to provide real world context. Supported `additionalData` properties include:\n\n`credential.additionalData.imageUrl`: URL of an image to represent the credential.\n\n`credential.additionalData.issuerImageUrl`: URL of an image to represent the issuer.\n\n`credential.additionalData.resources`: An array of objects including an `id` and `url` property.<h3>Other Properties</h3>\n\n`credential.expirationDate` (optional): The date when this credential expires. MUST be compliant with <a href='https://en.wikipedia.org/wiki/ISO_8601'>ISO 8601</a>.\n\n`credential.name` (optional): The name of the credential.\n\n`credential.description` (optional): The description of the credential.\n\n`credential.@context` (optional): A unique `@context` for your credential. By defining a custom `@context` you are able to customize the properties that may be defined within the credential, extending the base data model defined in the <a href='https://www.w3.org/TR/vc-data-model/'>W3C Verifiable Credentials Data Model</a>. Note that the `@context` value MUST be an object and unknown remote URLs will NOT be loaded and will be discarded.\n\n<h2>options (optional)</h2>\n<h3>options.responseType</h3>\nThe type of response you would like from the request. One or many may be requested.\n\nOptions include:\n\n`verifiableCredential`: Returns the raw credential as a Linked Data Proof.\n\n`walletInstallAndCredentialDownloadUrl`: Returns a URL that when navigated to will install a default Progressive Web App (PWA) based wallet and retrieve the credential. The `walletUrl` may also be customized with `options.walletUrl`.\n\n`walletInstallAndCredentialDownloadQrCode`: Returns the base64 encoding of the issuance URL encoded as a QR code. Most commonly this would be used for a Holder to use a wallet on a separate device, for example if the email was received on their laptop but they'd like to use their phone for the wallet.\n\n<pre><code>{\n\t'responseType': [\n\t\t'verifiableCredential',\n\t\t'walletInstallAndCredentialDownloadUrl'\n\t]\n}</code></pre>\n<h3>options.walletUrl</h3>Specify a custom URL to any wallet of your choosing which will be used for all responseTypes that involve a wallet url.<h3>options.requiredUserAuthentication</h3>\nAn array of values the end user must enter in order to authenticate themself to have the credential issued. If omitted than no authentication is required.\n\n`options.requiredUserAuthentication.property`: The identifier of the property, used to visualize in a user prompt or authentication screen.\n\n`options.requiredUserAuthentication.name`: The name of the value the user must enter to authenticate, this is most commonly what is shown to the end user, for example 'Passport Number'.\n\n`options.requiredUserAuthentication.description`: The description of the authenication requirements to communicate to the end user.\n\n`options.requiredUserAuthentication.acceptedValues`: An array of acceptable values the user may enter to successfully authenticate.\n\n`options.requiredUserAuthentication.reason`: The reason the authentication is required.<pre><code>{\n\t'requiredUserAuthentication': {\n\t\t'property': 'ppn',\n\t\t'name': 'Passport Number',\n\t\t'description': 'A valid intl Passport Number',\n\t\t'acceptedValues': [ 'HN109876' ],\n\t\t'reason': 'authentication'\n\t}\n}</code></pre><h3>options.holderContactDetails</h3>\nThe information used to communicate this credential to the Holder. Email and SMS are currently supported.\n\n`holderContactDetails.firstName`: The name the message will be addressed to.\n\n`holderContactDetails.type`: The means to use to contact the Holder. 'email' and 'sms' are supported.\n\n`holderContactDetails.to`: The actual contact details for the Holder, an email address or phone number are supported.\n<pre><code>{\n\t'holderContactDetails': {\n\t\t'firstName': 'Alice',\n\t\t'type': 'email',\n\t\t'to': 'alice@gmail.com'\n\t}\n}</code></pre>",
+        "parameters": [
+          {
+            "name": "vcx-api-key",
+            "in": "header",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "example": "1838e947-227d-4124-8125-f29a32b2516b"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["orgId"],
+                "properties": {
+                  "orgId": {
+                    "type": "string",
+                    "example": "5fc7979c78940d1bfe775924"
+                  },
+                  "credential": {
+                    "type": "object",
+                    "properties": {
+                      "credentialSubject": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "example": "Alice Scott"
+                          },
+                          "results": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "name": {
+                                  "type": "string",
+                                  "description": "The name of the result. For example Module #1, COVID-Test, passport number, etc.",
+                                  "example": "Module #1"
+                                },
+                                "value": {
+                                  "type": "string",
+                                  "description": "The value associated with the result field, for example Complete, 99/100, Negative, etc.",
+                                  "example": "Complete"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "additionalData": {
+                        "type": "object",
+                        "properties": {
+                          "imageUrl":{
+                            "type": "string",
+                            "example": "https://example.com/image.png"
+                          },
+                          "issuerImageUrl":{
+                            "type": "string",
+                            "example": "https://example.com/issuer-image.png"
+                          },
+                          "resources": {
+                            "type":"array",
+                            "items": {
+                              "type":"object",
+                              "properties":{
+                                "id": {
+                                  "type":"string",
+                                  "example":"Course Outline"
+                                },
+                                "url": {
+                                  "type":"string",
+                                  "example":"https://example.com/course-outline.pdf"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                },
+                "options": {
+                  "type": "object",
+                  "$ref": "#/components/schemas/CustomCredentialOptions"
+                }
+              }
+            }
+          }
+        }
+      },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type":"array",
+                  "example": [
+                    {
+                      "responstType": "walletInstallAndCredentialDownloadUrl",
+                      "url": "https://example.com/oidc/initiateLogin?iss%3Dhttp%3A%2F%2Flocalhost%3A3002%2Foidc%2Fauth%26login_hint%3D5a24ed1d-3121-4bdf-8a56-ffcddf569d81'"
+                    },
+                    {
+                      "responstType":"verifiableCredential",
+                      "verifiableCredential":{
+                        "@context": ["https://www.w3.org/2018/credentials/v1"],
+                        "id": "44b8c216-69b7-466f-9b42-aaf2a723a538",
+                        "type": ["VerifiableCredential"],
+                        "name": "Credential Name",
+                        "issuanceDate": "2021-04-28T11:06:21.813Z",
+                        "issuer": {
+                            "id": "did:key:z6MkvYcAZYp8iC4HhEUfrs6iq7ZT2WQtWkVhfDBXykTM4Kgp",
+                            "name": "Example Issuer",
+                            "url": "https://issuer.example.com"
+                        },
+                        "credentialSubject": {
+                            "id": "did:key:z6MkuXvDavCKvu9FfuMuoVHTzWkpfk9nc8Zzz9AicCc8j1fp",
+                            "name": "First Last",
+                            "results": [{
+                              "name": "Module #1",
+                              "value": "Complete"
+                            }]
+                        },
+                        "description": "This credential was earned by ... something great.",
+                        "expirationDate": "2026-04-28T11:06:21.813Z",
+                        "additionalData": {
+                            "imageUrl": "https://example.com/image.png",
+                            "issuerImageUrl": "https://example.com/issuer-image.png",
+                            "resources": [{
+                              "id": "Course Outline",
+                              "url": "https://example.com/outline.pdf"
+                            }]
+                        },
+                        "proof": {
+                          "type": "Ed25519Signature2018",
+                          "created": "2021-04-28T10:42:43.741Z",
+                          "jws": "eyJhbGciOiJFZERTQSIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..Hv-91QmyHjN1Dj73Di_WPzNU5Un90hBERsBZLiDHMlYxORJdElc9rlh8Eo4-BIY4K_BllWVojByShOTjMn9wBQ",
+                          "proofPurpose": "assertionMethod",
+                          "verificationMethod": "did:key:z6MkvYcAZYp8iC4HhEUfrs6iq7ZT2WQtWkVhfDBXykTM4Kgp#z6MkvYcAZYp8iC4HhEUfrs6iq7ZT2WQtWkVhfDBXykTM4Kgp"
+                        }
+                      }
+                    }
+                  ],
+                  "items":{
+                    "type":"object",
+                    "properties":{
+                      "responstType": {
+                        "example": "walletInstallAndCredentialDownloadUrl"
+                      },
+                      "url": {
+                        "example": "https://example.com/oidc/initiateLogin?iss%3Dhttp%3A%2F%2Flocalhost%3A3002%2Foidc%2Fauth%26login_hint%3D5a24ed1d-3121-4bdf-8a56-ffcddf569d81'"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequest. Most commonly due to missing paramters in the request body.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBadRequest"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Most commonly due to missing or invalid vcx-api-key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorUnauthorized"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource Not Found. Will throw org not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResourceNotFound"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/provider/getIssuedCredentials": {
+      "get": {
+        "tags": [
+          "Provider"
+        ],
+        "summary": "Get issued credentials for an organization.",
+        "description": "Many other indexes that were set upon issuance may also be passed in as query parameters",
+        "parameters": [
+          {
+            "name": "vcx-api-key",
+            "in": "header",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "example": "1838e947-227d-4124-8125-f29a32b2516b"
+            }
+          },
+          {
+            "name": "orgId",
+            "in": "query",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string",
+              "format": "ObjectID",
+              "example": "1838e9479a32b2516b"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IssueCredentialsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequest. Most commonly due to an invalid organization id.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBadRequest"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Most commonly due to missing or invalid vcx-api-key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorUnauthorized"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/provider/issueCredentials": {
+      "post": {
+        "tags": [
+          "Provider"
+        ],
+        "summary": "Issue credentials.",
+        "parameters": [
+          {
+            "name": "vcx-api-key",
+            "in": "header",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "example": "1838e947-227d-4124-8125-f29a32b2516b"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["orgId","credentials"],
+                "properties": {
+                  "orgId": {
+                    "type": "string",
+                    "description": "System UUID",
+                    "example": "5fc7979c78940d1bfe775924"
+                  },
+                  "credentials": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/CredentialToIssue"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        }
+      },
+        "responses": {
+          "201": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IssueCredentialsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequest. Most commonly due to missing paramters in the request body.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBadRequest"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Most commonly due to missing or invalid vcx-api-key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorUnauthorized"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource Not Found. Will throw org not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResourceNotFound"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/provider/bulkIssueCustomCredentials": {
+      "post": {
+        "tags": [
+          "Provider"
+        ],
+        "summary": "Issue a batch of custom credentials.",
+        "parameters": [
+          {
+            "name": "vcx-api-key",
+            "in": "header",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "example": "1838e947-227d-4124-8125-f29a32b2516b"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": true,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["orgId", "credential"],
+                  "properties": {
+                    "orgId": {
+                      "type": "string",
+                      "description": "System UUID",
+                      "example": "5fc7979c78940d1bfe775924"
+                    },
+                    "credential": {
+                      "type": "object",
+                      "$ref": "#/components/schemas/HealthCertsExample"
+                    },
+                    "options": {
+                      "type": "object",
+                      "$ref": "#/components/schemas/CustomCredentialOptions"
+                    }
+                }
+              }
+            }
+          },
+          "required": true
+        }
+      },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "responstType": {
+                      "example": "walletInstallAndCredentialDownloadUrl"
+                    },
+                    "url": {
+                      "example": "https://example.com/oidc/initiateLogin?iss%3Dhttp%3A%2F%2Flocalhost%3A3002%2Foidc%2Fauth%26login_hint%3D5a24ed1d-3121-4bdf-8a56-ffcddf569d81'"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequest. Most commonly due to missing paramters in the request body.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBadRequest"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Most commonly due to missing or invalid vcx-api-key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorUnauthorized"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource Not Found. Will throw org not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResourceNotFound"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/public/credential/{id}": {
+      "get": {
+        "tags": [
+          "Verify",
+          "Provider"
+        ],
+        "summary": "Get a raw credential by id.",
+        "description": "Used to efficiently share certificates publically. Used by the verifiers / renderers to retrieve certs.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "bdf2deae-02a2-4b4a-a2a5-a84b3e56e06d"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpenCertsCert"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResourceNotFound"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/public/cert/{id}": {
+      "get": {
+        "tags": [
+          "public"
+        ],
+        "summary": "Get a public cert.",
+        "description": "Used to efficiently share certificates publically. Used by the verifiers / renderers to retrieve certs.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "bdf2deae-02a2-4b4a-a2a5-a84b3e56e06d"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpenCertsCert"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResourceNotFound"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/public/downloadCert/{token}": {
+      "get": {
+        "tags": [
+          "public"
+        ],
+        "summary": "Download a cert.",
+        "description": "Used to pull a cert into a mobile wallet, will store raw cert on the device.",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "description": "Tokens are generated and only valid for short periods of time, tokens are generated on initial issuance by the issuer or the holder many generate them manually thereafter. Token when retrieved is associated with the id of a cert.",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "731c27c1acb06076965e1b0ab1e7b04fc7af56611c4fa6a9859ff0fcf0e90898"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpenCertsCert"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResourceNotFound"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/organizations/renderers/getConfig": {
+      "get": {
+        "tags": [
+          "public"
+        ],
+        "summary": "Get an org's renderer config.",
+        "description": "Used to retrieve the decentralized renderers for orgs to support rendering.",
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "query",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "5e94a08a60a283764a475d22"
+          },
+          {
+            "name": "rendererId",
+            "in": "query",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "TRYBE-DEFAULT"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SavedRenderer"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResourceNotFound"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/public/verifyCert": {
+      "post": {
+        "tags": [
+          "public",
+          "Provider"
+        ],
+        "summary": "Verify a cert.",
+        "description": "Full verification flow of the cert will return 200 or all verification fragments. The body is the complete cert JSON.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpenCertsCert"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Ok"
+          },
+          "400": {
+            "description": "Bad Request. The cert could not be verified, array of fragments returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ErrorBadRequest"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/wallets/archiveCredential": {
+      "put": {
+        "tags": [
+          "wallets"
+        ],
+        "summary": "Archive a credential inside a wallet.",
+        "description": "Set the state of a certification in the wallet to 'archived'. Can only be done by the entitiy that received the cert.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "certId": {
+                    "type": "string",
+                    "example": "99523711-9f83-40b9-b9d4-f8c56a96f524"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Ok"
+          },
+          "401": {
+            "description": "Unauthorized due to request account different than cert recipient.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ErrorNotAuthorized"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource Not Found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ErrorResourceNotFound"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/wallets/removeCredential": {
+      "delete": {
+        "tags": [
+          "wallets"
+        ],
+        "summary": "Delete a credential from a wallet.",
+        "description": "Delete a credential from a wallet after it is in the archived state. Can only be done by the entity that received the cert.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "certId": {
+                    "type": "string",
+                    "example": "99523711-9f83-40b9-b9d4-f8c56a96f524"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Ok"
+          },
+          "401": {
+            "description": "Unauthorized due to request account different than cert recipient.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ErrorNotAuthorized"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource Not Found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ErrorResourceNotFound"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Account": {
+        "required": [
+          "_id",
+          "email",
+          "firstName",
+          "lastName",
+          "roles"
+        ],
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "description": "Mongo ObjectID",
+            "example": "5e8b9b79038e185d975526c7"
+          },
+          "email": {
+            "type": "string",
+            "example": "alice@faber.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "$2a$08$qlIKiPrm9IrWbTi0ys554e5aYy6SaIhVOZLoSmA7dFMZhATA01fQS"
+          },
+          "firstName": {
+            "type": "string",
+            "example": "Alice"
+          },
+          "lastName": {
+            "type": "string",
+            "example": "Faber"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "admin"
+            }
+          },
+          "organizations": {
+            "$ref": "#/components/schemas/AccountOrganization"
+          }
+        },
+        "description": "A user account"
+      },
+      "AccountOrganization": {
+        "type": "object",
+        "properties": {
+          "default": {
+            "type": "string",
+            "description": "Mongo ObjectID of the organization. Organization must first exist before an account can be created.",
+            "example": "5e8b9b77038e185d975526c6"
+          }
+        }
+      },
+      "AccountRequest": {
+        "required": [
+          "email",
+          "firstName",
+          "lastName",
+          "organizations",
+          "password",
+          "roles"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "alice@faber.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "mysecurepassword"
+          },
+          "firstName": {
+            "type": "string",
+            "example": "Alice"
+          },
+          "lastName": {
+            "type": "string",
+            "example": "Faber"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "holder"
+            }
+          },
+          "organizations": {
+            "type": "object",
+            "properties": {
+              "default": {
+                "type": "string",
+                "description": "The known (human-readable) name of the organization.",
+                "example": "Convergence.tech"
+              }
+            }
+          }
+        },
+        "description": "A user account"
+      },
+      "AddContactsRequest": {
+        "required": [
+          "contacts",
+          "tags"
+        ],
+        "type": "object",
+        "properties": {
+          "contacts": {
+            "$ref": "#/components/schemas/ContactItem"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "Class 1"
+            }
+          }
+        }
+      },
+      "Contact": {
+        "required": [
+          "contact",
+          "firstName",
+          "lastName",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "The type of contact, email, phone number, DID",
+            "example": "email"
+          },
+          "contact": {
+            "type": "string",
+            "description": "The contact identifier itself, email addres, phone number, did",
+            "example": "alice@gmail.com"
+          },
+          "firstName": {
+            "type": "string",
+            "example": "Alice"
+          },
+          "lastName": {
+            "type": "string",
+            "example": "Faber"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "Class 1"
+            }
+          }
+        },
+        "description": "The detail for a contact of an account"
+      },
+      "ContactItem": {
+        "type": "array",
+        "description": "An array of 4 elements, [type, contact, firstName, lastName]",
+        "items": {
+          "type": "string",
+          "example": "[\"Alice\",\"Faber\",\"alice@gmail.com\",\"email\"]"
+        }
+      },
+      "CredentialDefinitionRequest": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of this credential. This must be unique under a specific organization.",
+            "example": "Blockchain Learning Group's Impact Series"
+          },
+          "$template": {
+            "$ref": "#/components/schemas/RendererTemplate"
+          },
+          "additionalData": {
+            "type": "object"
+          },
+          "transcript": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TranscriptField"
+            }
+          }
+        }
+      },
+      "CredentialDefinition": {
+        "required": [
+          "additionalData",
+          "definitions",
+          "imageUrl",
+          "issuerEmail",
+          "issuerOrganization",
+          "name",
+          "recipients",
+          "renderer"
+        ],
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "description": "uuid generated by mongo",
+            "example": "5ddb303e38e3d1513de7d6df"
+          },
+          "definition": {
+            "type": "string",
+            "description": "JSON.stringify(rawDefinition), the stringified definition",
+            "example": "{\"name\":\"Blockchain Learning Group's Impact Series\",\"$template\":{\"name\":\"12345\",\"type\":\"EMBEDDED_RENDERER\",\"url\":\"https://certificate-renderer.now.sh\"},\"transcript\":[{\"name\":\"Problem Statements and Blockchain Concepts\",\"grade\":\"PASS\",\"courseCode\":\"impact-series-001\"},{\"name\":\"Impact Project\",\"grade\":\"\",\"courseCode\":\"impact-series-008\"}],\"additionalData\":{\"imageUrl\":\"https://trybe.id/icon\"}}\n"
+          },
+          "renderer": {
+            "$ref": "#/components/schemas/RendererTemplate"
+          },
+          "issuerEmail": {
+            "type": "string",
+            "example": "alice@example.com"
+          },
+          "issuerOrganization": {
+            "type": "string",
+            "description": "Mongo ObjectID for the org.",
+            "example": "5e8cbb8a96aeda4a486d0082"
+          },
+          "name": {
+            "type": "string",
+            "example": "Blockchain Learning Group's Impact Series"
+          },
+          "additionalData": {
+            "type": "object",
+            "properties": {
+              "issuerImageUrl": {
+                "type": "string",
+                "example": "https://trybe.id/icon"
+              }
+            }
+          },
+          "recipients": {
+            "type": "number",
+            "example": 11
+          },
+          "imageUrl": {
+            "type": "string",
+            "example": "https://trybe.id/icon"
+          },
+          "sovrinDefinitionId": {
+            "type": "string",
+            "description": "If this credential has been defined atop Sovrin we need to know the definition id for later issuance. Note the network is abstracted away and determined by execution environment but perhaps needs to be explicitly noted as well?",
+            "example": "C3t3wkpAxJKwAdRncbAckB:3:CL:122966:default"
+          },
+          "state": {
+            "type": "string",
+            "descsription": "'Confirmed' or 'Archived'"
+          }
+        }
+      },
+      "CredentialToIssue": {
+        "required": [
+          "name",
+          "recipient"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Blockchain Learning Groups Impact Series"
+          },
+          "recipient": {
+            "type": "object",
+            "required": ["name", "email"],
+            "properties": {
+              "name": {
+                "type": "string",
+                "example": "Alice Faber"
+              },
+              "email": {
+                "type": "string",
+                "example": "alice@gmail.com"
+              }
+            }
+          },
+          "transcript": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TranscriptField"
+            }
+          },
+          "additionalData": {
+            "type": "object",
+            "example": {
+              "imageUrl": "https://resources.trybe.id/icon",
+              "description": "Description about the course.",
+              "rendererConfigId": "5fec9305c04b0a00319f79e0"
+            }
+          }
+        },
+        "description": "A built cert that is ready to be issued."
+      },
+      "DeleteSecret": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "Deleted"
+          },
+          "message": {
+            "type": "string",
+            "example": "Successfully deleted."
+          }
+        }
+      },
+      "ErrorBadRequest": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "BadRequest"
+          },
+          "message": {
+            "type": "string",
+            "example": "Could not <action> to <collection>..."
+          }
+        }
+      },
+      "ErrorConflict": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "Conflict"
+          },
+          "message": {
+            "type": "string",
+            "example": "Organization / Account / etc (Convergence.tech) already exists..."
+          }
+        }
+      },
+      "ErrorInvalidContent": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "InvalidContent"
+          },
+          "message": {
+            "type": "string",
+            "example": "Type is invalid..."
+          }
+        }
+      },
+      "ErrorNotAuthorized": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "NotAuthorized"
+          },
+          "message": {
+            "type": "string",
+            "example": "adamjlemmon@gmail.com attempted to / not authorized to... /organizations/register"
+          }
+        }
+      },
+      "ErrorResourceNotFound": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "ResourceNotFound"
+          },
+          "message": {
+            "type": "string",
+            "example": "Resource: <resource id> in collection: <collection-id> could not be found..."
+          }
+        }
+      },
+      "ErrorInvalidCredentials": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "InvalidCredentials"
+          },
+          "message": {
+            "type": "string",
+            "example": "Some credential is invalid ie. The token has expired and will now be removed..."
+          }
+        }
+      },
+      "ErrorUnauthorized": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "Unauthorized"
+          },
+          "message": {
+            "type": "string",
+            "example": "Missing or invalid API Key."
+          }
+        }
+      },
+      "HealthCertsExample": {
+        "required": [
+          "type",
+          "credentialSubject"
+        ],
+        "example": {
+          "type":[
+            "VerifiableCredential",
+            "HealthPassportBundleCredentialV1"
+          ],
+          "credentialSubject": {
+            "data":{
+              "@type":"BundleContainer",
+              "id":"Unique test ID",
+              "name":"HealthCert",
+              "validFrom":"2021-01-27T22:11:54.196Z",
+              "fhirVersion":"4.0.1",
+              "fhirBundle":{
+                "@type":"Bundle",
+                "resourceType":"Bundle",
+                "type":"collection",
+                "entry":[
+                  {
+                    "resourceType":"Patient",
+                    "extension":[
+                      {
+                        "url":"http://hl7.org/fhir/StructureDefinition/patient-nationality",
+                        "code":{
+                          "text":"SG"
+                        }
+                      }
+                    ],
+                    "identifier":[
+                      {
+                        "type":{
+                          "text":"NRIC"
+                        },
+                        "value":"S9098989Z"
+                      },
+                      {
+                        "type": "PPN",
+                        "value":"HN1234"
+                      }
+                    ],
+                    "name":[
+                      {
+                        "text":"Tan Chen Chen"
+                      }
+                    ],
+                    "gender":"female",
+                    "birthDate":"1990-01-15"
+                  },
+                  {
+                    "resourceType":"Specimen",
+                    "type":{
+                      "coding":[
+                        {
+                          "system":"http://snomed.info/sct",
+                          "code":"258500001",
+                          "display":"Nasopharyngeal swab"
+                        }
+                      ]
+                    },
+                    "collection":{
+                      "collectedDateTime":"2020-09-27T06:15:00Z"
+                    }
+                  },
+                  {
+                    "resourceType":"Observation",
+                    "identifier":[
+                      {
+                        "value":"123456789",
+                        "type":"ACSN"
+                      }
+                    ],
+                    "code":{
+                      "coding":[
+                        {
+                          "system":"http://loinc.org",
+                          "code":"94531-1",
+                          "display":"Reverse transcription polymerase chain reaction (rRT-PCR) test"
+                        }
+                      ]
+                    },
+                    "valueCodeableConcept":{
+                      "coding":[
+                        {
+                          "system":"http://snomed.info/sct",
+                          "code":"260385009",
+                          "display":"Negative"
+                        }
+                      ]
+                    },
+                    "effectiveDateTime":"2020-09-28T06:15:00Z",
+                    "status":"final",
+                    "performer":{
+                      "name":[
+                        {
+                          "text":"Dr Michael Lim"
+                        }
+                      ]
+                    },
+                    "qualification":[
+                      {
+                        "identifier":"MCR 123214",
+                        "issuer":"MOH"
+                      }
+                    ]
+                  },
+                  {
+                    "resourceType":"Organization",
+                    "name":"MacRitchie Medical Clinic",
+                    "type":"Licensed Healthcare Provider",
+                    "contact":{
+                      "telecom":[
+                        {
+                          "system":"phone",
+                          "value":"+6563113111"
+                        }
+                      ],
+                      "address":{
+                        "type":"physical",
+                        "use":"work",
+                        "text":"MacRitchie Hospital Thomson Road Singapore 123000"
+                      }
+                    }
+                  },
+                  {
+                    "resourceType":"Organization",
+                    "name":"Quest Laboratories",
+                    "type":"Accredited Laboratory",
+                    "id": "quest-labs-0198",
+                    "contact":{
+                      "telecom":[
+                        {
+                          "system":"phone",
+                          "value":"+6563113111"
+                        }
+                      ],
+                      "address":{
+                        "type":"physical",
+                        "use":"work",
+                        "text":"Quest Laboratories Address"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "array",
+            "description": "List of verifiable credential types as defined in https://www.w3.org/TR/vc-data-model/.",
+            "items": {
+              "type": "string",
+              "example": "HealthPassportBundleCredentialV1"
+            }
+          },
+          "credentialSubject": {
+            "type": "object",
+            "required": ["data"],
+            "properties": {
+              "data": {
+                "type": "object",
+                "properties": {
+                  "fhirBundle": {
+                    "type": "object",
+                    "properties":{
+                      "resourceType":{
+                        "description":"This is a Bundle resource",
+                        "enum":[
+                          "Bundle"
+                        ]
+                      },
+                      "type":{
+                        "description":"Indicates the purpose of this bundle - how it is intended to be used.",
+                        "enum":[
+                          "collection"
+                        ],
+                        "examples":[
+                          "collection"
+                        ]
+                      },
+                      "entry":{
+                        "description":"An entry in a bundle resource - will contain information about Patient, Speciment, Observation or Organization.",
+                        "type":"array",
+                        "minItems":5,
+                        "items":{
+                          "oneOf":[
+                            {
+                              "$ref":"#/components/schemas/Patient"
+                            },
+                            {
+                              "$ref":"#/components/schemas/Specimen"
+                            },
+                            {
+                              "$ref":"#/components/schemas/Observation"
+                            },
+                            {
+                              "$ref":"#/components/schemas/HealthCertsOrganization"
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "Patient":{
+        "description":"Demographics and other administrative information about an individual or animal receiving care or other health-related services.",
+        "type":"object",
+        "required":[
+          "resourceType",
+          "extension",
+          "identifier",
+          "name",
+          "gender",
+          "birthDate"
+        ],
+        "properties":{
+          "resourceType":{
+            "type":"string",
+            "enum":[
+              "Patient"
+            ]
+          },
+          "extension":{
+            "type":"array",
+            "additionalItems":true,
+            "minItems":1,
+            "items":{
+              "type":"object",
+              "required":[
+                "url",
+                "code"
+              ],
+              "properties":{
+                "url":{
+                  "type":"string",
+                  "examples":[
+                    "http://hl7.org/fhir/StructureDefinition/patient-nationality"
+                  ]
+                },
+                "code":{
+                  "type":"object",
+                  "required":[
+                    "text"
+                  ],
+                  "properties":{
+                    "text":{
+                      "type":"string",
+                      "examples":[
+                        "SG"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "identifier":{
+            "description":"An identifier for this patient.",
+            "type":"array",
+            "additionalItems":true,
+            "minItems":1,
+            "items":{
+              "type":"object",
+              "required":[
+                "type",
+                "value"
+              ],
+              "properties":{
+                "type":{
+                  "oneOf":[
+                    {
+                      "type":"string",
+                      "examples":[
+                        "PPN"
+                      ]
+                    },
+                    {
+                      "type":"object",
+                      "required":[
+                        "text"
+                      ],
+                      "properties":{
+                        "text":{
+                          "type":"string",
+                          "examples":[
+                            "NRIC"
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                },
+                "value":{
+                  "type":"string",
+                  "examples":[
+                    "E7831177G"
+                  ]
+                }
+              }
+            }
+          },
+          "name":{
+            "description":"A name associated with the individual.",
+            "type":"array",
+            "minItems":1,
+            "items":{
+              "type":"object",
+              "required":[
+                "text"
+              ],
+              "properties":{
+                "text":{
+                  "description":"Specifies the entire name as it should be displayed e.g. on an application UI. This may be provided instead of or as well as the specific parts.",
+                  "type":"string",
+                  "examples":[
+                    "Tan Chen Chen"
+                  ]
+                }
+              }
+            }
+          },
+          "gender":{
+            "description":"Administrative Gender - the gender that the patient is considered to have for administration and record keeping purposes.",
+            "enum":[
+              "male",
+              "female"
+            ]
+          },
+          "birthDate":{
+            "description":"The date of birth for the individual.",
+            "type":"string",
+            "format":"date"
+          }
+        }
+      },
+      "Specimen":{
+        "description":"A sample to be used for analysis.",
+        "type":"object",
+        "required":[
+          "resourceType",
+          "type",
+          "collection"
+        ],
+        "properties":{
+          "resourceType":{
+            "type":"string",
+            "enum":[
+              "Specimen"
+            ]
+          },
+          "type":{
+            "description":"The kind of material that forms the specimen.",
+            "$ref":"#/components/schemas/CodeableConcept"
+          },
+          "collection":{
+            "description":"Details concerning the specimen collection.",
+            "type":"object",
+            "required":[
+              "collectedDateTime"
+            ],
+            "properties":{
+              "collectedDateTime":{
+                "description":"Time when specimen was collected from subject - the physiologically relevant time.",
+                "type":"string",
+                "format":"date-time"
+              }
+            }
+          }
+        }
+      },
+      "Observation":{
+        "description":"Measurements and simple assertions made about a patient, device or other subject.",
+        "type":"object",
+        "required":[
+          "resourceType",
+          "identifier",
+          "code",
+          "valueCodeableConcept",
+          "effectiveDateTime",
+          "qualification",
+          "status"
+        ],
+        "properties":{
+          "resourceType":{
+            "type":"string",
+            "enum":[
+              "Observation"
+            ]
+          },
+          "identifier":{
+            "description":"A unique identifier assigned to this observation.",
+            "type":"array",
+            "additionalItems":true,
+            "items":{
+              "type":"object",
+              "required":[
+                "value",
+                "type"
+              ],
+              "properties":{
+                "value":{
+                  "type":"string",
+                  "description":"lab accession number",
+                  "examples":[
+                    "123456789"
+                  ]
+                },
+                "type":{
+                  "type":"string",
+                  "examples":[
+                    "ACSN"
+                  ]
+                }
+              }
+            },
+            "minItems":1
+          },
+          "code":{
+            "description":"Describes what was observed. Sometimes this is called the observation \"name\".",
+            "$ref":"#/components/schemas/CodeableConcept"
+          },
+          "valueCodeableConcept":{
+            "description":"The information determined as a result of making the observation, if the information has a simple value.",
+            "$ref":"#/components/schemas/CodeableConcept"
+          },
+          "effectiveDateTime":{
+            "description":"The time or time-period the observed value is asserted as being true. For biological subjects - e.g. human patients - this is usually called the \"physiologically relevant time\". This is usually either the time of the procedure or of specimen collection, but very often the source of the date/time is not known, only the date/time itself.",
+            "type":"string",
+            "format":"date-time"
+          },
+          "performer":{
+            "description":"Who was responsible for asserting the observed value as \"true\".",
+            "type":"object",
+            "required":[
+              "name"
+            ],
+            "properties":{
+              "name":{
+                "type":"array",
+                "additionalItems":true,
+                "items":{
+                  "type":"object",
+                  "required":[
+                    "text"
+                  ],
+                  "properties":{
+                    "text":{
+                      "description":"Specifies the entire name as it should be displayed e.g. on an application UI. This may be provided instead of or as well as the specific parts.",
+                      "type":"string",
+                      "examples":[
+                        "Dr Michael Lim"
+                      ]
+                    }
+                  }
+                },
+                "minItems":1
+              }
+            }
+          },
+          "qualification":{
+            "type":"array",
+            "additionalItems":true,
+            "items":{
+              "type":"object",
+              "required":[
+                "identifier",
+                "issuer"
+              ],
+              "properties":{
+                "identifier":{
+                  "type":"string",
+                  "examples":[
+                    "MCR 123214"
+                  ]
+                },
+                "issuer":{
+                  "type":"string",
+                  "examples":[
+                    "MOH"
+                  ]
+                }
+              }
+            },
+            "minItems":1
+          },
+          "status":{
+            "description":"The status of the result value.",
+            "enum":[
+              "registered",
+              "preliminary",
+              "final",
+              "amended",
+              "corrected",
+              "cancelled",
+              "entered-in-error",
+              "unknown"
+            ]
+          }
+        }
+      },
+      "HealthCertsOrganization":{
+        "description":"A formally or informally recognized grouping of people or organizations formed for the purpose of achieving some form of collective action.  Includes companies, institutions, corporations, departments, community groups, healthcare practice groups, payer/insurer, etc.",
+        "type":"object",
+        "required":[
+          "resourceType",
+          "name",
+          "type",
+          "contact"
+        ],
+        "properties":{
+          "resourceType":{
+            "type":"string",
+            "enum":[
+              "Organization"
+            ]
+          },
+          "name":{
+            "description":"A name associated with the organization.",
+            "type":"string",
+            "examples":[
+              "Raffles Medical Clinic",
+              "MacRitchie Laboratory"
+            ]
+          },
+          "type":{
+            "description":"The kind(s) of organization that this is.",
+            "type":"string",
+            "examples":[
+              "Licensed Healthcare Provider",
+              "Accredited Laboratory"
+            ]
+          },
+          "endpoint":{
+            "description":"Technical endpoints providing access to services operated for the organization.",
+            "type":"object",
+            "required":[
+              "address"
+            ],
+            "properties":{
+              "address":{
+                "type":"string",
+                "format":"uri",
+                "examples":[
+                  "https://www.rafflesmedical.com.sg"
+                ]
+              }
+            }
+          },
+          "contact":{
+            "description":"Contact for the organization for a certain purpose.",
+            "type":"object",
+            "required":[
+              "telecom",
+              "address"
+            ],
+            "properties":{
+              "telecom":{
+                "description":"A contact detail (e.g. a telephone number or an email address) by which the party may be contacted.",
+                "type":"array",
+                "additionalItems":true,
+                "items":{
+                  "type":"object",
+                  "required":[
+                    "system",
+                    "value"
+                  ],
+                  "properties":{
+                    "system":{
+                      "description":"Telecommunications form for contact point - what communications system is required to make use of the contact.",
+                      "enum":[
+                        "phone",
+                        "fax",
+                        "email",
+                        "pager",
+                        "url",
+                        "sms",
+                        "other"
+                      ],
+                      "examples":[
+                        "phone"
+                      ]
+                    },
+                    "value":{
+                      "description":"The actual contact point details, in a form that is meaningful to the designated communication system (i.e. phone number or email address).",
+                      "type":"string",
+                      "examples":[
+                        "+6563113111",
+                        "+6562711188"
+                      ]
+                    }
+                  }
+                },
+                "minItems":1
+              },
+              "address":{
+                "description":"Visiting or postal addresses for the contact.",
+                "type":"object",
+                "required":[
+                  "type",
+                  "use",
+                  "text"
+                ],
+                "properties":{
+                  "type":{
+                    "description":"Distinguishes between physical addresses (those you can visit) and mailing addresses (e.g. PO Boxes and care-of addresses). Most addresses are both.",
+                    "enum":[
+                      "postal",
+                      "physical",
+                      "both"
+                    ],
+                    "examples":[
+                      "postal"
+                    ]
+                  },
+                  "use":{
+                    "description":"The purpose of this address.",
+                    "enum":[
+                      "home",
+                      "work",
+                      "temp",
+                      "old",
+                      "billing"
+                    ],
+                    "examples":[
+                      "home"
+                    ]
+                  },
+                  "text":{
+                    "description":"Specifies the entire address as it should be displayed e.g. on a postal label. This may be provided instead of or as well as the specific parts.",
+                    "type":"string",
+                    "examples":[
+                      "MacRitchie Hospital Thomson Road Singapore 123000",
+                      "2 Thomson Avenue 4 Singapore 098888"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "CustomCredentialOptions": {
+        "type": "object",
+        "example": {
+          "requiredUserAuthentication": [{
+            "property": "ppn",
+            "name": "Passport Number",
+            "description": "Passport Number.",
+            "acceptedValues": ["HN1234"],
+            "reason": "authentication"
+          }],
+          "responseType": [
+            "verifiableCredential",
+            "walletInstallAndCredentialDownloadUrl",
+          ],
+          "holderContactDetails": {
+            "firstName": "Alice",
+            "type": "email",
+            "to": "alice@gmail.com"
+          }
+        },
+        "properties": {
+          "requiredUserAuthentication": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["property", "name", "description", "reason"],
+              "properties": {
+                "property": {
+                  "type":"string",
+                  "example": "nric"
+                },
+                "name": {
+                  "type":"string",
+                  "example": "NRIC"
+                },
+                "description": {
+                  "type":"string",
+                  "example": "Singapore National Registration Identity Card."
+                },
+                "acceptedValues": {
+                  "type": "array",
+                  "description": "When user authenitication is required, this is a list the user must authenticate against.",
+                  "items": {
+                    "type": "string",
+                    "exmaple": "S9098989Z"
+                  }
+                },
+                "reason": {
+                  "type":"string",
+                  "example": "authentication"
+                }
+              }
+            }
+          },
+          "responseType": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "walletInstallAndCredentialDownloadUrl"
+            }
+          },
+          "holderContactDetails": {
+            "type":"object",
+            "properties":{
+              "firstName":{
+                "description": "The name the message with be addressed to.",
+                "type":"string"
+              },
+              "type":{
+                "description": "`email` or `sms`.",
+                "type":"string"
+              },
+              "to":{
+                "description": "An email address or phone number.",
+                "type":"string"
+              }
+            },
+            "example": {
+              "firstName": "Alice",
+              "type": "email",
+              "to": "alice@gmail.com"
+            }
+          },
+          "walletUrl": {
+            "type":"string",
+            "example": "https://wallet.example.com"
+          }
+        }
+      },
+      "IDObject": {
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "48f4c086-7f4e-45fa-b6ed-b6b1f79e74d0"
+          }
+        }
+      },
+      "IssueCredentialRequestCert": {
+        "required": [
+          "additionalData",
+          "id",
+          "issuedOn",
+          "name",
+          "recipient"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Blockchain Learning Group's Impact Series"
+          },
+          "additionalData": {
+            "type": "object"
+          },
+          "recipient": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "example": "Alice Faber"
+              },
+              "email": {
+                "type": "string",
+                "example": "alice@gmail.com"
+              }
+            }
+          },
+          "id": {
+            "type": "string",
+            "example": "034d1dab-f0c2-49d7-91e3-6a5e9c87f70e"
+          },
+          "issuedOn": {
+            "type": "string",
+            "example": "2020-04-07T19:51:24.335Z"
+          },
+          "transcript": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TranscriptField"
+            }
+          }
+        },
+        "description": "A built cert that is ready to be issued."
+      },
+      "IssueCredentialsResponse": {
+        "type": "object",
+        "properties": {
+          "issuedCredentials": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OpenCertsCert"
+            }
+          },
+          "savedCredentials": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SavedOpenCertsCert"
+            }
+          },
+          "merkleRoot": {
+            "type": "string",
+            "description": "The merkle root created from the certs that was written on-chain.",
+            "example": "0xb9a8de55c15e99223e908bfa880c5e7026f2810f2ee34b7720651f4d79845db9"
+          },
+          "transactionHash": {
+            "type": "string",
+            "description": "The transaction that was sent to the blockchain. Still to be confirmed.",
+            "example": "0xc7c64e8e1d282570145fc2dbc0d393cf42884ffb4e5db93bf45b3d17d662fafd"
+          }
+        }
+      },
+      "CodeableConcept":{
+        "description":"A concept that may be defined by a formal reference to a terminology or ontology or may be provided by text.",
+        "type":"object",
+        "required":[
+          "coding"
+        ],
+        "properties":{
+          "coding":{
+            "description":"A reference to a code defined by a terminology system.",
+            "type":"array",
+            "additionalItems":true,
+            "items":{
+              "type":"object",
+              "required":[
+                "system",
+                "code",
+                "display"
+              ],
+              "properties":{
+                "system":{
+                  "description":"The identification of the code system that defines the meaning of the symbol in the code.",
+                  "type":"string",
+                  "examples":[
+                    "http://snomed.info/sct"
+                  ],
+                  "format":"uri"
+                },
+                "code":{
+                  "type":"string",
+                  "examples":[
+                    "258500001"
+                  ]
+                },
+                "display":{
+                  "description":"A representation of the meaning of the code in the system, following the rules of the system.",
+                  "type":"string",
+                  "examples":[
+                    "Nasopharyngeal swab"
+                  ]
+                }
+              }
+            },
+            "minItems":1
+          }
+        }
+      },
+      "IssueSecret": {
+        "type": "object",
+        "properties": {
+          "secret": {
+            "type": "string",
+            "example": "6d136e96-63c3-436d-9e8a-6316c89999c0"
+          },
+          "_id": {
+            "type": "number",
+            "example": "5fd3d25a87a0ca3b094e8629"
+          }
+        }
+      },
+      "LoginRequest": {
+        "required": [
+          "email",
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "adamjlemmon"
+          },
+          "password": {
+            "type": "string",
+            "example": "hello"
+          }
+        }
+      },
+      "LoginResponse": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "jwt token",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZGJiODhlNzg0YzhmMDNmM2ZmNzZjOWEiLCJ1c2VybmFtZSI6ImFkYW1AY29udmVyZ2VuY2UudGVjaDc0MC4yNDM4ODkwNDc0NjU2IiwiaWF0IjoxNTcyNTcxMzY3LCJleHAiOjE1NzI1ODAzNjd9.96lfQtuvlbHAnodJ_MbQlVqc-laZWt_DTL9uWZRSW5g"
+          },
+          "account": {
+            "$ref": "#/components/schemas/Account"
+          }
+        }
+      },
+      "OpenCertsCert": {
+        "required": [
+          "data",
+          "proof",
+          "schema",
+          "signature",
+          "vc"
+        ],
+        "type": "object",
+        "properties": {
+          "schema": {
+            "type": "string",
+            "example": "opencerts/v2.0"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "example": "7af92b7b-f0df-4ea7-bf10-9db2feb03dfb:string:Blockchain Learning Groups Impact Series"
+              },
+              "transcript": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              },
+              "additionalData": {
+                "type": "object"
+              },
+              "recipient": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "2886e177-130d-43b9-80b9-2cb997518ef9:string:Adam Lemmon"
+                  },
+                  "email": {
+                    "type": "string",
+                    "example": "b0c3e7c0-bf9a-427e-851d-cd19166801eb:string:adam@blockchainlearninggroup.com"
+                  }
+                }
+              },
+              "id": {
+                "type": "string",
+                "example": "d1f6dd48-c706-41a5-93a8-ff14e90017d4:string:5f909e5a-5873-4217-b435-d573ca85416c"
+              },
+              "issuedOn": {
+                "type": "string",
+                "example": "ec3252e8-e2b8-4c7c-a377-79d0a62c9325:string:2020-04-09T18:00:04.800Z"
+              },
+              "issuers": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "signature": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "example": "SHA3MerkleProof"
+              },
+              "targetHash": {
+                "type": "string",
+                "example": "b63ca0d784c650c12976a7ac7fd4fd14d5530f45e635235e72b8847e30b97786"
+              },
+              "proof": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "description": "merkle proof hashes"
+                }
+              },
+              "merkleRoot": {
+                "type": "string",
+                "example": "b63ca0d784c650c12976a7ac7fd4fd14d5530f45e635235e72b8847e30b97786"
+              }
+            }
+          },
+          "proof": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "example": "EcdsaSecp256k1Signature2019"
+              },
+              "created": {
+                "example": "2020-04-15T16:36:08.291Z"
+              },
+              "proofPurpose": {
+                "example": "assertionMethod"
+              },
+              "verificationMethod": {
+                "example": "did:ethr:ropsten:0x79913e2918b90c4AFAA068288232a88c91e92bCb#owner"
+              },
+              "signature": {
+                "example": "0xefe61f6580470d39c5910d867d8f3e86462b3a19649d1b1f216d06ca3585395823d6a13970f58aa800544244c782779e7f168ac3dc4e6df40651419997dc19d01c"
+              }
+            }
+          },
+          "vc": {
+            "$ref": "#/components/schemas/VerifiableCredentialLDProof"
+          }
+        }
+      },
+      "Organization": {
+        "required": [
+          "assets",
+          "domains",
+          "imageUrls",
+          "name",
+          "renderers"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the organization.",
+            "example": "Convergence.tech University"
+          },
+          "description": {
+            "type": "string",
+            "description": "Some details about the organization",
+            "example": "Higher Ed based in Toronto specializing in technology."
+          },
+          "domains": {
+            "$ref": "#/components/schemas/OrganizationDomains"
+          },
+          "imageUrls": {
+            "$ref": "#/components/schemas/OrganizationImageUrls"
+          },
+          "aliases": {
+            "type": "array",
+            "description": "Aliases this organization may wish to operate under.",
+            "items": {
+              "type": "string",
+              "example": "Convergence"
+            }
+          },
+          "renderers": {
+            "required": [
+              "TRYBE_DEFAULT"
+            ],
+            "type": "object",
+            "properties": {
+              "TRYBE_DEFAULT": {
+                "$ref": "#/components/schemas/OrganizationRenderers"
+              },
+              "other": {
+                "type": "object"
+              }
+            }
+          },
+          "linkedinOrganizationId": {
+            "type": "string",
+            "description": "The linkedin id number to allow for the org's icon to be populated immediately with the one-click add to LinkedIn functionality.",
+            "example": "27004961"
+          },
+          "assets": {
+            "type": "array",
+            "description": "Other external assets this organization has added / uploaded. For example pdfs, images or documents.",
+            "items": {
+              "$ref": "#/components/schemas/OrganizationAssets"
+            }
+          },
+          "certificateStores": {
+            "$ref": "#/components/schemas/OrganizationCertificateStores"
+          },
+          "publicKeys": {
+            "$ref": "#/components/schemas/OrganizationPublicKeys"
+          }
+        },
+        "description": "The details of an organization"
+      },
+      "OrganizationAssets": {
+        "required": [
+          "key",
+          "provider",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "provider": {
+            "type": "string",
+            "description": "The storage provider where this asset lives.",
+            "example": "aws-s3"
+          },
+          "type": {
+            "type": "string",
+            "description": "formal mime-type",
+            "example": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+          },
+          "key": {
+            "type": "string",
+            "example": "https://s3.ca-central-1.amazonaws.com/trybe.public.assets/prod/STEAM%203D%20Maker%20Lab/Reference.docx"
+          }
+        }
+      },
+      "OrganizationCertificateStores": {
+        "type": "object",
+        "properties": {
+          "default": {
+            "$ref": "#/components/schemas/OrganizationCertificateStoreItem"
+          }
+        }
+      },
+      "OrganizationCertificateStoreItem": {
+        "type": "object",
+        "properties": {
+          "relay": {
+            "type": "string",
+            "description": "Certificate store smart contract this issuer is using. A valid Ethereum address.",
+            "example": "0xAF1945054F315DD9E34ef4D2e2612d53791705fc"
+          },
+          "store": {
+            "type": "string",
+            "description": "Another certificate store",
+            "example": "0xcaBA254f42348C25B51B2fE8499A9977AC9B95E2"
+          }
+        }
+      },
+      "OrganizationDomains": {
+        "type": "object",
+        "properties": {
+          "default": {
+            "type": "string",
+            "description": "valid http(s) domains",
+            "example": "https://convergence.tech"
+          },
+          "other": {
+            "type": "string",
+            "description": "other valid http(s) domains",
+            "example": "https://other.convergence.tech"
+          }
+        }
+      },
+      "OrganizationImageUrls": {
+        "type": "object",
+        "properties": {
+          "default": {
+            "type": "string",
+            "description": "valid URL to image.",
+            "example": "https://res.cloudinary.com/dadlqfryt/image/upload/v1571451072/convergence-logos/Convergence_Logo_Final-01_tq5wtd.png"
+          },
+          "other": {
+            "type": "string",
+            "description": "other valid image URLs.",
+            "example": "https://image.convergence.tech"
+          }
+        }
+      },
+      "OrganizationRequest": {
+        "required": [
+          "domains",
+          "imageUrls",
+          "issuers",
+          "name",
+          "renderers"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the organization.",
+            "example": "Convergence.tech University"
+          },
+          "domains": {
+            "$ref": "#/components/schemas/OrganizationDomains"
+          },
+          "imageUrls": {
+            "$ref": "#/components/schemas/OrganizationImageUrls"
+          },
+          "renderers": {
+            "$ref": "#/components/schemas/OrganizationRenderers"
+          },
+          "issuers": {
+            "type": "array",
+            "description": "The type of issuers (credential types) this organization supports. Default to [`opencerts`].",
+            "items": {
+              "type": "string",
+              "example": "sovrin"
+            }
+          },
+          "aliases": {
+            "type": "array",
+            "description": "Aliases this organization may wish to operate under.",
+            "items": {
+              "type": "string",
+              "example": "Convergence"
+            }
+          },
+          "description": {
+            "type": "string",
+            "description": "Some details about the organization",
+            "example": "Higher Ed based in Toronto specializing in technology."
+          }
+        },
+        "description": "The details of an organization"
+      },
+      "OrganizationSubscription": {
+        "description": "The details of an organization's subscription.",
+        "required": [
+          "durationMonths",
+          "credentialLimit"
+        ],
+        "type": "object",
+        "example": {
+          "durationMonths": 3,
+          "credentialLimit": 50,
+          "overage": {
+            "disruptService": true,
+            "perCredentialCost": 0,
+            "perCredentialCostCurrency": "CAD",
+            "overageLimitPercentage": 0 
+          },  
+          "payment": {
+            "status": "COMPLETE",
+            "amount": 0,
+            "currency": "CAD",
+            "updatedAt": "2021-03-13T17:38:32.782Z"
+          },
+          "subscriptionChannel": {
+            "name": "Trybe.ID",
+            "redirectUrl": "https://app.trybe.id/subscription"
+          } 
+        },
+        "properties": {
+          "durationMonths": {
+            "type": "number",
+            "description": "How long the subscription will remain active for.",
+            "example": 3
+          },
+          "credentialLimit": {
+            "type": "number",
+            "description": "Total quantity of credentials that may be issued over the subscription duration.",
+            "example": 50
+          },
+          "overage": {
+            "type": "object",
+            "description": "Details about what occurs when an overage is reached.",
+            "properties": {
+              "disruptService": {
+                "description": "Is the organization's service should be terminated once an overage is reached.",
+                "type": "boolean"
+              },
+              "perCredentialCost": {
+                "description": "Cost for each credential used over the credential limit.",
+                "type": "number"
+              },
+              "perCredentialCostCurrency": {
+                "description": "Currency overage will be charged in.",
+                "type": "string"
+              },
+              "overageLimitPercentage": {
+                "description": "How far over until service is terminated.",
+                "type": "number"
+              }
+            },
+            "example": {
+              "disruptService": true,
+              "perCredentialCost": 0,
+              "perCredentialCostCurrency": "CAD",
+              "overageLimitPercentage": 0 
+            }
+          },
+          "payment": {
+            "type": "object",
+            "description": "Details about the status of payment for this subscription.",
+            "properties": {
+              "status": {
+                "description": "If payment has been received, pending or other.",
+                "type": "string"
+              },
+              "amount": {
+                "description": "Payment amount.",
+                "type": "number"
+              },
+              "currency": {
+                "description": "The currency the payment was made in.",
+                "type": "string"
+              },
+              "updatedAt": {
+                "description": "ISO timestamp of last update.",
+                "type": "string"
+              }
+            },
+            "example": {
+              "status": "COMPLETE",
+              "amount": 0,
+              "currency": "CAD",
+              "updatedAt": "2021-03-13T17:38:32.782Z"
+            }
+          },
+          "subscriptionChannel": {
+            "type": "object",
+            "description": "Details about the channel this subscription was purchased through and where to redirect the user to edit / review such.",
+            "properties": {
+              "name": {
+                "description": "Unique name for the channel used.",
+                "type": "string"
+              },
+              "redirectUri": {
+                "description": "Where to redirect the user to review their subscription or when action required.",
+                "type": "string"
+              }
+            },
+            "example": {
+              "name": "Trybe.ID",
+              "redirectUri": "https://app.trybe.id/subscription"
+            }
+          }
+        }
+      },
+      "OrganizationPublicKeys": {
+        "type": "object",
+        "properties": {
+          "default": {
+            "type": "string",
+            "description": "Some public key messages will be signed with.",
+            "example": "0x931acB6c057c7FDF983Ca4cBdC690551875DFf22"
+          },
+          "other": {
+            "type": "string",
+            "description": "Another public key.",
+            "example": "0x1234cB6c057c7FDF983Ca4cBdC690551875DFf22"
+          }
+        }
+      },
+      "OrganizationRenderers": {
+        "type": "object",
+        "properties": {
+          "gradient": {
+            "type": "string",
+            "description": "valid identifier of a renderer.  This will likely be a URL within the context of this organization.",
+            "example": "linear-gradient(to right bottom, #fff, #0077ca)"
+          },
+          "bgImage": {
+            "type": "string",
+            "description": "A valid URL to a background image for the certificate.",
+            "example": "https://s3.ca-central-1.amazonaws.com/trybe.public.assets/Identity+Nor..."
+          },
+          "text1": {
+            "type": "string",
+            "description": "The font color to be used for the static certificate text.",
+            "example": "{\"color\":\"#808080\"}"
+          },
+          "text2": {
+            "type": "string",
+            "description": "The font color to be used for the recipient specific text.",
+            "example": "{\"color\":\"#000\"}"
+          }
+        }
+      },
+      "ProviderCredentialToIssue": {
+        "required": [
+          "credentials",
+          "orgId"
+        ],
+        "type": "object",
+        "properties": {
+          "orgId": {
+            "type": "string"
+          },
+          "credentials": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "name",
+                "recipient"
+              ],
+              "properties": {
+                    "name": {
+                        "type": "string",
+                        "description": "Unique id that the renderer will be saved under.",
+                        "example": "default"
+                    },
+                    "recipient": {
+                        "required": [
+                          "name",
+                          "email"
+                        ],
+                        "type": "object",
+                        "properties": {
+                              "name": {
+                                  "type": "string",
+                                  "example": "Alice Scott"
+                              },
+                              "email": {
+                                  "type": "string",
+                                  "example": "alice@gmail.com"
+                              }
+                        }
+                    }
+              }
+            }
+          }
+        }
+      },
+      "RendererRequest": {
+        "required": [
+          "config",
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique id that the renderer will be saved under.",
+            "example": "TRYBE-DEFAULT"
+          },
+          "orgId": {
+            "type": "string",
+            "description": "Unique id for the org this is being added to.",
+            "example": "5ed7be98383cb7749e374efc"
+          },
+          "config": {
+            "type": "object",
+            "properties": {
+              "color": {
+                "type": "string",
+                "example": "blue"
+              },
+              "shape": {
+                "type": "string",
+                "example": "square"
+              }
+            },
+            "description": "Unique config properties for this renderer."
+          }
+        }
+      },
+      "SavedRenderer": {
+        "type": "object",
+        "properties": {
+          "color": {
+            "type": "string",
+            "example": "blue"
+          },
+          "shape": {
+            "type": "string",
+            "example": "square"
+          }
+        }
+      },
+      "RendererTemplate": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The unique name of the renderer to be used.",
+            "example": "GOVTECH_DEMO"
+          },
+          "type": {
+            "type": "string",
+            "description": "So the verifier portal knows how to renderer the template.",
+            "example": "EMBEDDED_RENDERER"
+          },
+          "url": {
+            "type": "string",
+            "description": "Where the renderer is hosted.",
+            "example": "https://certificate-renderer.now.sh"
+          }
+        }
+      },
+      "SavedOpenCertsCert": {
+        "required": [
+          "_id",
+          "credentialName",
+          "id",
+          "imageUrl",
+          "issuerAccount",
+          "issuerImageUrl",
+          "issuerOrganization",
+          "issuerOrganizationId",
+          "publicUrl",
+          "rawCertificate",
+          "recipient",
+          "recipientName",
+          "state"
+        ],
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "description": "uuid generated by mongo",
+            "example": "5ddb303e38e3d1513de7d6df"
+          },
+          "id": {
+            "type": "string",
+            "description": "Trybe.ID uuid.",
+            "example": "95ae1fe8-2916-4f1f-991a-97b534fdb5a6"
+          },
+          "rawCertificate": {
+            "type": "string",
+            "description": "JSON.stringify(rawCertificate), the stringified certificate",
+            "example": "{\"schema\":\"opencerts/v2.0\",\"data\":{\"id\":\"035d1369-7070-4fe0-b0a7-ddeee7dd0394:string:048861d5-dd4b-49cd-b4a2-dbcaf3a8e92d\",\"$template\":{\"name\":\"3569b6c2-9ae7-4768-b55c-3a1d9a8d4373:string:GOVTECH_DEMO\",\"type\":\"70b34d3a-a7e6-4c9d-a41d-8384f6ed281c:string:EMBEDDED_RENDERER\",\"url\":\"7d4fb2ef-5f6a-4fd9-bee1-b941403cf4a5:string:https://certificate-renderer.now.sh\"},\"name\":\"91a9bf56-481b-4ecc-a9e9-4189bc24ada1:string:Blockchain Learning Group's Impact Series\",\"issuedOn\":\"eb10f5f8-c663-44d8-a49f-9cf12bfe3da2:string:2020-04-07T17:16:08.805Z\",\"issuers\":[{\"name\":\"cd612033-f5c0-4a3e-ba8a-a148c761f639:string:Convergence.tech\",\"url\":\"873723ec-5c6b-465e-8d39-cb526a5131f9:string:https://convergence.tech\",\"certificateStore\":\"6d41a3f7-9d21-42b8-aa80-a06d103c3c3f:string:0x733a6F54869De9dCEA8CEEb4650BDa651E285e94\",\"identityProof\":{\"type\":\"5c2a0a98-ab83-4adf-bd8f-0c6d1d7aa4c6:string:DNS-TXT\",\"location\":\"8c1103ef-baf1-46e9-97ff-53ac20d8ef50:string:convergence.tech\"}}],\"recipient\":{\"name\":\"af60b99c-3683-4ee4-aa08-2678789eed49:string:Adam Lemmon\",\"email\":\"6bd46646-c9e5-4890-900f-09b4ed3ff54f:string:adam\"},\"transcript\":[{\"name\":\"54a402fa-6926-4249-aee2-a1b9ab390fff:string:Problem Statements and Blockchain Concepts\",\"grade\":\"89956890-4134-4f17-9c19-937f7282febf:string:PASS\",\"courseCode\":\"c8e250dc-8dc4-4ed7-94b8-9a7930c19352:string:impact-series-001\"},{\"name\":\"334e118d-b829-4fa6-b343-c751cfe40ca1:string:Blockchain Fundamentals\",\"grade\":\"d511f60a-63a4-4380-9d42-73317f17ec58:string:PASS\",\"courseCode\":\"6a1a2569-746a-4b33-99d7-dc79f29bb6e4:string:impact-series-002\"}],\"additionalData\":{}},\"privacy\":{\"obfuscatedData\":[]},\"signature\":{\"type\":\"SHA3MerkleProof\",\"targetHash\":\"08987c828481f1eecdd2f86d8348cfa135c32c722cd552798f5fa41ea105df85\",\"proof\":[\"bf186ea0522cc7147fdaa34b1ba7a38fcfd8cb7b6383726daba26ac3178a26db\",\"dd8695b69637f4e0b56568e5e0752175438d577e3f8cefd33e037d5efa49d40c\"],\"merkleRoot\":\"ed3366f6371551d7b07cbaaea6506a554a075b26adc33c1437fc66548a34d27e\"}}\n"
+          },
+          "recipient": {
+            "type": "string",
+            "example": "alice@example.com"
+          },
+          "recipientName": {
+            "type": "string",
+            "example": "Alice Faber"
+          },
+          "issuerOrganization": {
+            "type": "string",
+            "example": "Blockchain Learning Group Inc."
+          },
+          "issuerOrganizationId": {
+            "type": "string",
+            "example": "5e8cb22415af66415102c64f"
+          },
+          "credentiaName": {
+            "type": "string",
+            "example": "Blockchain Learning Group's Impact Series"
+          },
+          "merkleRoot": {
+            "type": "string",
+            "example": "9211d252029c538ff8be384be3d497bc53285690cd16895d06ab4990d28ade22"
+          },
+          "targetHash": {
+            "type": "string",
+            "description": "The hash of the raw certificate above, used to verify existence with the published merkle tree.",
+            "example": "487a719a9f3de2d2bdad20e27a5a1e3e373ea4e59b3ab6e327e045027ba1c6f2"
+          },
+          "issuerAccount": {
+            "type": "string",
+            "example": "adam@convergence.tech"
+          },
+          "publicUrl": {
+            "type": "string",
+            "example": "https://vc.convergence.tech?2abc66dc-5a37-4c5d-bb96-cad1a87a7be5#dev"
+          },
+          "imageUrl": {
+            "type": "string",
+            "example": "https://trybe.id/icon"
+          },
+          "issuerImageUrl": {
+            "type": "string",
+            "example": "https://trybe.id/icon"
+          },
+          "state": {
+            "type": "string",
+            "description": "Pending, Confirmed, Revoked",
+            "example": "pending"
+          },
+          "downloadUrl": {
+            "type": "string",
+            "description": "A URL that made be used to download the certificate to another storage location, usually a wallet. Likely need more descrption around this but mainly used for VC issuance to the Trinsic wallet and also for download to the GovTech wallet.",
+            "example": "https://redir.streetcred.id/HXmKkYh9YkdG"
+          },
+          "addToLinkedinUrl": {
+            "type": "string",
+            "description": "One-click URL to add this credential to the recipients LinkedIn profile.",
+            "example": "https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&name=IdentitynNORTH%20Annual%20Summit%202020%20Professional%20Development%20Certification&organizationId=&organizationName=%5BDEMO%5D%20IdentityNORTH%20&issueYear=2020&issueMonth=5&certUrl=https%3A%2F%2Fapp.trybe.id%2Fverifier%3Fid%3D1e119b53-9d80-4dba-b7e1-b12df99f0e7c%26&certId=1e119b53-9d80-4dba-b7e1-b12df99f0e7c"
+          }
+        }
+      },
+      "IssueCredentialsBatchResponse" : {
+        "type": "object",
+        "properties": {
+          "totalItems": {
+            "type": "string",
+            "description": "Total number of certificates issued for the organization",
+            "example": "3456"
+          },
+          "pageSize": {
+            "type": "string",
+            "description": "Maximum number of items per page",
+            "example": "1"
+          },
+          "pageNumber": {
+            "type": "string",
+            "description": "Number of the page for provided certifications",
+            "example": "3"
+          },
+          "issuedCerts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SavedOpenCertsCert"
+            }
+          }
+        }
+      },
+      "SetPasswordRequest": {
+        "required": [
+          "password",
+          "tokenValue"
+        ],
+        "type": "object",
+        "properties": {
+          "tokenValue": {
+            "type": "string",
+            "description": "The raw token value. This is used to query to db to validate and find account to set.",
+            "example": "3ed14fe88d6236ab34454005156cd3124f2af1f7ef03a28a0fe1f543ca65dd52"
+          },
+          "password": {
+            "type": "string",
+            "example": "plain text password"
+          }
+        }
+      },
+      "SetPasswordToken": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "type": "string",
+            "description": "Identifier for the account.",
+            "example": "alice@faber.com"
+          },
+          "value": {
+            "type": "string",
+            "description": "The raw vaule, uuid, for the token.",
+            "example": "bf5ba1d2c1d4b21df4084743e3acf3f103a4a9284664d9fdc4c230f70ff22cbb"
+          },
+          "expiry": {
+            "type": "string",
+            "description": "Expiry time of the token (ms). '(Date.now() + SET_PASSWORD_EXPIRY_MS).toFixed()'",
+            "example": "1586208892134"
+          },
+          "_id": {
+            "type": "string",
+            "description": "Mongo _id (ObjectID)",
+            "example": "5e8b926c84a3285783c15ea6"
+          }
+        },
+        "description": "Token that is generated in order to set an account's password."
+      },
+      "TranscriptField": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The specific field name.",
+            "example": "Problem Statements and Blockchain Concepts /  Assignment 1"
+          },
+          "grade": {
+            "type": "string",
+            "description": "This is undefined at the point of definition."
+          },
+          "courseCode": {
+            "type": "string",
+            "description": "Some identifier generally internal for the field.",
+            "example": "impact-series-008"
+          }
+        }
+      },
+      "TxHash": {
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "transactionHash": {
+            "type": "string",
+            "example": "0x4fd09ff7f71589905f158ea3b54e4adcb21d91fba0b1a8905a889d0b6bd2ff4c"
+          }
+        }
+      },
+      "VerifiableCredential": {
+        "required": [
+          "@context",
+          "id",
+          "type",
+          "issuer",
+          "issuanceDate",
+          "credentialSubject"
+        ],
+        "type": "object",
+        "properties": {
+          "@context": {},
+          "id": {},
+          "type": {},
+          "issuer": {},
+          "issuanceDate": {},
+          "credentialSubject": {}
+        },
+        "example": {
+          "@context": [
+            "https://www.w3.org/2018/credentials/v1",
+           "https://www.w3.org/2018/credentials/examples/v1"
+          ],
+          "id": "urn:uuid:b283ca6c-134f-4d3e-a46a-0a5c312b5e2b",
+          "type": [ "VerifiableCredential", "UniversityDegree" ],
+          "issuer": {
+            "id": "did:key:z6MkgHxqyP3Y8ag2fRpJHZwxwecGFm21usgUyvjfZdfEabdW"
+          },
+          "issuanceDate": "2020-12-02T17:25:56.985Z",
+          "credentialSubject": {
+            "id": "did:key:z6MkisNGAAR8Pc9HP1CK1WbzcdCV9Pjp36kEGFijotipw4cV",
+            "degree": {
+              "type": "BachelorDegree",
+              "name": "Bachelor of Science and Arts"
+           }
+          }
+        }
+      },
+      "VerifiableCredentialLDProof": {
+        "required": [
+          "@context",
+          "id",
+          "type",
+          "issuer",
+          "issuanceDate",
+          "credentialSubject",
+          "proof"
+        ],
+        "type": "object",
+        "properties": {
+          "@context": {},
+          "type": {},
+          "issuer": {},
+          "issuanceDate": {},
+          "credentialSubject": {},
+          "proof": {}
+        },
+        "example": {
+          "@context": [
+             "https://www.w3.org/2018/credentials/v1",
+             "https://www.w3.org/2018/credentials/examples/v1"
+          ],
+          "id": "http://example.gov/credentials/3732",
+          "type": [
+             "VerifiableCredential",
+             "UniversityDegreeCredential"
+          ],
+          "issuer": {
+             "id": "did:key:z6MkoWWvB2fzAqX5KqZSVQrhKvQ8rXxLUy1FrxB8cvdPnmCm"
+          },
+          "issuanceDate": "2020-03-10T04:24:12.164Z",
+          "credentialSubject": {
+             "id": "did:key:z6MkoWWvB2fzAqX5KqZSVQrhKvQ8rXxLUy1FrxB8cvdPnmCm",
+             "degree": {
+                "type": "BachelorDegree",
+                "name": "Bachelor of Science and Arts"
+             }
+          },
+          "proof": {
+             "type": "Ed25519Signature2018",
+             "created": "2020-03-10T04:24:12.164Z",
+             "jws": "eyJhbGciOiJFZERTQSIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..o2xJuvNOvPgX-0OOtq54q-l7MIVCRBFOkiHzRP-hnpd3JDNnoQx6lqE9b1WNyvhqIG6K7JFA_kRWo0M5FiB_Ag",
+             "proofPurpose": "assertionMethod",
+             "verificationMethod": "did:key:z6MkoWWvB2fzAqX5KqZSVQrhKvQ8rXxLUy1FrxB8cvdPnmCm#z6MkoWWvB2fzAqX5KqZSVQrhKvQ8rXxLUy1FrxB8cvdPnmCm"
+          }
+       }
+      },
+      "VerifiablePresentation": {
+        "required": [
+          "@context",
+          "id",
+          "type",
+          "holder",
+          "verifiableCredential"
+        ],
+        "type": "object",
+        "properties": {
+          "@context": {},
+          "id": {},
+          "type": {},
+          "holder": {},
+          "verifiableCredential": {}
+        },
+        "example": {
+          "@context": [
+             "https://www.w3.org/2018/credentials/v1"
+          ],
+          "type": [
+             "VerifiablePresentation"
+          ],
+          "id": "urn:uuid:704d6bda-40a0-4ec1-921b-9075edf33e6f",
+          "holder": "did:key:z6MkgHxqyP3Y8ag2fRpJHZwxwecGFm21usgUyvjfZdfEabdW",
+          "verifiableCredential": [
+             {
+                "@context": [
+                   "https://www.w3.org/2018/credentials/v1",
+                   "https://www.w3.org/2018/credentials/examples/v1"
+                ],
+                "id": "http://example.gov/credentials/3732",
+                "type": [
+                   "VerifiableCredential",
+                   "UniversityDegreeCredential"
+                ],
+                "issuer": {
+                   "id": "did:key:z6Mkhcqz38U51dU3zUiMZAbDUgvKmddrpcarDzQJU7RoqETp"
+                },
+                "issuanceDate": "2020-03-10T04:24:12.164Z",
+                "credentialSubject": {
+                   "id": "did:key:z6MkgHxqyP3Y8ag2fRpJHZwxwecGFm21usgUyvjfZdfEabdW",
+                   "degree": {
+                      "type": "BachelorDegree",
+                      "name": "Bachelor of Science and Arts"
+                   }
+                },
+                "proof": {
+                   "type": "Ed25519Signature2018",
+                   "created": "2020-03-10T04:24:12.164Z",
+                   "jws": "eyJhbGciOiJFZERTQSIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..9MP0QZUQi0DxaoIB0_KTtdrZQuFHiO7yzmORE0IOLZND13KbQkHx6_Gjgm6d4NEmeH6B4TaLNNYJk0Zz8D5BBA",
+                   "proofPurpose": "assertionMethod",
+                   "verificationMethod": "did:key:z6Mkhcqz38U51dU3zUiMZAbDUgvKmddrpcarDzQJU7RoqETp#z6Mkhcqz38U51dU3zUiMZAbDUgvKmddrpcarDzQJU7RoqETp"
+                }
+             }
+          ]
+        }
+      },
+      "VerifiablePresentationLDProof": {
+        "required": [
+          "@context",
+          "id",
+          "type",
+          "holder",
+          "verifiableCredential",
+          "proof"
+        ],
+        "type": "object",
+        "properties": {
+          "@context": {},
+          "id": {},
+          "type": {},
+          "holder": {},
+          "verifiableCredential": {},
+          "proof": {}
+        },
+        "example": {
+          "@context": [
+             "https://www.w3.org/2018/credentials/v1"
+          ],
+          "type": [
+             "VerifiablePresentation"
+          ],
+          "id": "urn:uuid:96436ccd-0d17-41bd-b7f2-3d6e2751e0e1",
+          "holder": "did:key:z6MkgHxqyP3Y8ag2fRpJHZwxwecGFm21usgUyvjfZdfEabdW",
+          "verifiableCredential": [
+             {
+                "@context": [
+                   "https://www.w3.org/2018/credentials/v1",
+                   "https://www.w3.org/2018/credentials/examples/v1"
+                ],
+                "id": "http://example.gov/credentials/3732",
+                "type": [
+                   "VerifiableCredential",
+                   "UniversityDegreeCredential"
+                ],
+                "issuer": {
+                   "id": "did:key:z6MkjRwSnsPuDL62LMJVx1pDgm5WAxb6XqJ5jwRqFWWdkJYu"
+                },
+                "issuanceDate": "2020-03-10T04:24:12.164Z",
+                "credentialSubject": {
+                   "id": "did:key:z6MkjRwSnsPuDL62LMJVx1pDgm5WAxb6XqJ5jwRqFWWdkJYu",
+                   "degree": {
+                      "type": "BachelorDegree",
+                      "name": "Bachelor of Science and Arts"
+                   }
+                },
+                "proof": {
+                   "type": "Ed25519Signature2018",
+                   "created": "2020-03-10T04:24:12.164Z",
+                   "jws": "eyJhbGciOiJFZERTQSIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..qzSQW2_0RHAtiyC4siBOAguN9dGSLbavn4yIeeFJ8s1fqPSAHYm-juSMueQulIunPDSPM3d30tV-H1toHeFDDA",
+                   "proofPurpose": "assertionMethod",
+                   "verificationMethod": "did:key:z6MkjRwSnsPuDL62LMJVx1pDgm5WAxb6XqJ5jwRqFWWdkJYu#z6MkjRwSnsPuDL62LMJVx1pDgm5WAxb6XqJ5jwRqFWWdkJYu"
+                }
+             }
+          ],
+          "proof": {
+             "type": "Ed25519Signature2018",
+             "created": "2020-12-17T11:53:59.931Z",
+             "challenge": "48c0a280-0533-45b6-9dda-f03e36733782",
+             "jws": "eyJhbGciOiJFZERTQSIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..XmyXU6A62rFvHsAC2OHjUGH9nUFemtO7AQz9AgoJZOizJY_zW4a1H8pQ96aJr0jGcU8JWHqpGSFeYu2f5zn4Bg",
+             "proofPurpose": "authentication",
+             "verificationMethod": "did:key:z6MkgHxqyP3Y8ag2fRpJHZwxwecGFm21usgUyvjfZdfEabdW#z6MkgHxqyP3Y8ag2fRpJHZwxwecGFm21usgUyvjfZdfEabdW"
+          }
+        }
+      },
+      "JWTVerifiableCredential": {
+        "required": [
+          "sub",
+          "iss",
+          "aud",
+          "iat",
+          "exp",
+          "jti",
+          "vc"
+        ],
+        "type": "object",
+        "properties": {
+          "sub": {
+            "description": "Credential subject identifier.",
+            "type": "string",
+            "example": "urn:uuid:bfc5108e-9b51-4ed1-bdd6-8cc265643760"
+          },
+          "iss": {
+            "description": "Issuer identifier.",
+            "type": "string",
+            "example": "https://book.itsourweb.org:3000/ohip"
+          },
+          "iat": {
+            "description": "Issued at timestamp.",
+            "type": "number",
+            "example": 1614259997
+          },
+          "exp": {
+            "description": "Expiry timestamp.",
+            "type": "number",
+            "example": 1614432797
+          },
+          "aud": {
+            "description": "Audience identifier.",
+            "type": "string",
+            "example": "https://book.itsourweb.org:3000/wallet/wallet.html"
+          },
+          "jti": {
+            "description": "JWT identifier, credential identifier.",
+            "type": "string",
+            "example": "urn:uuid:09030bff-ae33-4c86-afd2-285c8afe80ab"
+          },
+          "vc": {
+            "description": "Verifiable credential specific claims.",
+            "type": "object",
+            "required": [
+              "@context",
+              "type",
+              "credentialSubject"
+            ],
+            "properties": {
+              "@context": {
+                "description": "JSON-LD contexts.",
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "example": "https://www.w3.org/2018/credentials/v1"
+                }
+              },
+              "type": {
+                "description": "Verifiable Credential types. Extended to support Smart Credential Provider URLs.",
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "example": "VerifiableCredential"
+                }
+              },
+              "descrption": {
+                "description": "Credential description.",
+                "type": "string",
+                "example": "Digital Health Card"
+              },
+              "credentialSubject": {
+                "description": "Data about the subject of the Credential.",
+                "type": "object",
+                "properties": {
+                  "healthNumber": {
+                    "example": "1122334455"
+                  },
+                  "versionNumber": {
+                    "example": "NV"
+                  },
+                  "dateOfBirth": {
+                    "example": "1995/}07/10"
+                  },
+                  "firstName": {
+                    "example": "Jane"
+                  },
+                  "lastName": {
+                    "example": "Doe"
+                  },
+                  "postalCode": {
+                    "example": "M6H3B3"
+                  },
+                  "status": {
+                    "example": "OK"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "sub": "urn:uuid:bfc5108e-9b51-4ed1-bdd6-8cc265643760",
+          "iss": "https://book.itsourweb.org:3000/ohip",
+          "iat": 1614259997,
+          "exp": 1614432797,
+          "aud": "https://book.itsourweb.org:3000/wallet/wallet.html",
+          "jti": "urn:uuid:09030bff-ae33-4c86-afd2-285c8afe80ab",
+          "vc": {
+            "@context": [
+              "https://www.w3.org/2018/credentials/v1",
+              "https://ohip.ontario.ca/v1"
+            ],
+            "type": [
+              "VerifiableCredential",
+              "https://did.itsourweb.org:3000/smart-credential/Ontario-Health-Insurance-Plan"
+            ],
+            "description": "OHIP status",
+            "credentialSubject": {
+              "healthNumber": "1122334455",
+              "versionNumber": "NV",
+              "dateOfBirth": "1995/07/10",
+              "firstName": "Jane",
+              "lastName": "Doe",
+              "postalCode": "M6H3B3",
+              "status": "OK"
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "Bearer Token": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "Api Key": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "vcx-api-key"
+      }
+    }
+  }
+}
