@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "./node_modules/redoc-cli/index.js bundle swagger.json --options.noAutoAuth --options.theme.spacing.sectionVertical=5px"    
+    "build": "./node_modules/redoc-cli/index.js bundle swagger.json -o index.html --options.noAutoAuth --options.theme.spacing.sectionVertical=5px"    
   },
   "repository": {
     "type": "git",
