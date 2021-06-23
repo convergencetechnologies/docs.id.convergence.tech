@@ -2,7 +2,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Convergence.Tech Identity (C.TI) API",
-    "description": "<img src='https://s3.ca-central-1.amazonaws.com/trybe.public.assets/prod/Convergence.Tech+Identity+(CTI)/Convergence.Tech+Identity+(C.TI)+Architecture.png'/><br /><h1>Issue Verifiable Credentials, simply.</h1>Point and shoot capabilities. Get started fast, no setup required.<br /><br /><ol><li>Register and obtain your api key and orgId (simply contact info@convergence.tech)</li><li>Start issuing digital credentials</li></ol>",
+    "description": "<br /><h1>Issue Verifiable Credentials, simply.</h1>Point and shoot capabilities. Get started fast, no setup required.<br /><br /><ol><li>Register and obtain your api key and orgId (simply contact info@convergence.tech)</li><li>Start issuing digital credentials</li></ol>",
     "contact": {
       "email": "adam@convergence.tech"
     },
@@ -27,6 +27,10 @@
     }
   ],
   "tags": [
+    {
+      "name": "Architecture",
+      "description": "<img src='https://s3.ca-central-1.amazonaws.com/trybe.public.assets/prod/Convergence.Tech+Identity+(CTI)/Convergence.Tech+Identity+(C.TI)+Architecture.png'/>"
+    },
     {
       "name": "Provider",
       "description": "Quick start `Credential Provider`. Intergrate this API seamlessly into your existing applications to leverage Verifiable Credentials."
